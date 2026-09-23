@@ -2,7 +2,7 @@
 
 GTA San Andreas için hikâye modu. 1992 Los Santos'ta DEA ajanı Raymond Cross, eşinin kanser tedavisi için gereken parayı bulmaya çalışırken rozetiyle vicdanı arasında kalır.
 
-Tasarım belgesi: [docs/GDD.md](docs/GDD.md)
+Tasarım belgesi: [docs/GDD.md](docs/GDD.md) · Mekân konumları: [docs/KONUMLAR.md](docs/KONUMLAR.md)
 
 ## Gereksinimler
 

@@ -1,0 +1,47 @@
+// Proje mekanlari - butun scriptler koordinatlari SADECE bu dosyadan okur.
+// Faz 1'de oyunda F9 ile kaydedildi (2026-09-23). Kaynak: docs/KONUMLAR.md
+// IC = iç mekan numarasi (0 = dis dunya)
+
+const
+    // 1 - Cross ailesinin evi, Jefferson (kapi onu)
+    EV_X = 2191.52
+    EV_Y = -1275.61
+    EV_Z = 25.16
+    EV_YON = 2.5
+
+    // 2 - LSPD/DEA burosu, Pershing Square (ic mekan girisi)
+    BURO_IC_X = 246.78
+    BURO_IC_Y = 63.90
+    BURO_IC_Z = 1003.64
+    BURO_IC = 6
+    // dis kapi henuz kaydedilmedi, yaklasik
+    BURO_DIS_X = 1541.0
+    BURO_DIS_Y = -1675.0
+
+    // 3 - Idlewood benzinliginin arkasi
+    BENZINLIK_X = 1904.32
+    BENZINLIK_Y = -1795.20
+    BENZINLIK_Z = 13.54
+    BENZINLIK_YON = 273.8
+
+    // 4 - All Saints General Hospital girisi, Market
+    HASTANE_X = 1177.39
+    HASTANE_Y = -1323.29
+    HASTANE_Z = 14.07
+    HASTANE_YON = 98.0
+
+    // 5 - Jefferson Motel oda ici
+    MOTEL_IC_X = 2240.04
+    MOTEL_IC_Y = -1170.66
+    MOTEL_IC_Z = 1029.80
+    MOTEL_IC = 15
+    // dis kapi henuz kaydedilmedi, yaklasik
+    MOTEL_DIS_X = 2229.0
+    MOTEL_DIS_Y = -1160.0
+
+    // 6 - Ocean Docks, konteyner alani
+    LIMAN_X = 2781.21
+    LIMAN_Y = -2542.61
+    LIMAN_Z = 13.64
+    LIMAN_YON = 91.4
+end

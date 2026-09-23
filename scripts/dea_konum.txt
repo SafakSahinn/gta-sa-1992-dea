@@ -3,6 +3,7 @@
 // F9: o anki konumu cleo\dea_konumlar.txt dosyasina ekle
 // F10: siradaki proje mekanina isinlan
 {$CLEO .cs}
+{$INCLUDE include\konumlar.txt}
 
 script_name {name} 'deakonm'
 
@@ -90,37 +91,37 @@ while true
             if
                 hedef == 1
             then
-                ISINLAN(2185.0, -1290.0)
+                ISINLAN(EV_X, EV_Y)
                 print_string_now {text} "~y~1/6 JEFFERSON~s~ - bir aile evi bul, kapisinda F9" {time} 5000
             end
             if
                 hedef == 2
             then
-                ISINLAN(1541.0, -1675.0)
+                ISINLAN(BURO_DIS_X, BURO_DIS_Y)
                 print_string_now {text} "~y~2/6 LSPD BUROSU~s~ - giris kapisinda F9" {time} 5000
             end
             if
                 hedef == 3
             then
-                ISINLAN(1940.0, -1772.0)
+                ISINLAN(BENZINLIK_X, BENZINLIK_Y)
                 print_string_now {text} "~y~3/6 IDLEWOOD BENZINLIK~s~ - arka tarafta F9" {time} 5000
             end
             if
                 hedef == 4
             then
-                ISINLAN(1182.0, -1323.0)
+                ISINLAN(HASTANE_X, HASTANE_Y)
                 print_string_now {text} "~y~4/6 ALL SAINTS~s~ - giris kapisinda F9" {time} 5000
             end
             if
                 hedef == 5
             then
-                ISINLAN(2229.0, -1160.0)
+                ISINLAN(MOTEL_DIS_X, MOTEL_DIS_Y)
                 print_string_now {text} "~y~5/6 JEFFERSON MOTEL~s~ - bir oda kapisinda F9" {time} 5000
             end
             if
                 hedef == 6
             then
-                ISINLAN(2765.0, -2455.0)
+                ISINLAN(LIMAN_X, LIMAN_Y)
                 print_string_now {text} "~y~6/6 OCEAN DOCKS~s~ - konteynerlerin arasinda F9" {time} 5000
             end
         end
