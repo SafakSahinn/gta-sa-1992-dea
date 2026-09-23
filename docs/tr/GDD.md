@@ -32,16 +32,16 @@
 
 ## 2. OYUN İÇİ DONANIM VE ARAYÜZ
 
-> Tuşların hepsi **geçicidir**; Faz 1'de SA'nın varsayılan kontrolleriyle çakışma testi yapılıp kesinleşecek.
+> Tuşlar Faz 1'de oyunun belleğinden okunan tuş atamalarıyla karşılaştırıldı (`dev_controls_dump`, bkz. [CONTROLS.md](../CONTROLS.md)). Aşağıdaki tuşların hepsi SA'nın varsayılanlarında boş.
 
-| Donanım | Tuş (geçici) | İşlevi |
+| Donanım | Tuş | İşlevi |
 |---|---|---|
 | **Polis Cep Defteri** | `B` *(v1'de N idi — N, SA'nın "Hayır" tuşu)* | Deri kaplı, el yazısı defter. Sayfa 1: telsiz anonsları ve vaka notları. Sayfa 2: şüpheli ve muhbir ifadeleri. Sayfa 3: kişisel notlar ve borç listesi. |
 | **Tuğla Telefon** (Motorola MicroTAC 9800X) | `P` | Sadece **sesli arama**: Sarah, Danny, Amir Garcia, Miller, Dr. Evans, Slick. *(1992'de tüketici SMS'i yoktu; yazılı mesajlar pager'a taşındı.)* |
 | **Pager** | otomatik | Hastane ve büro mesajları. Ekran büyük harf ve Türkçe karaktersiz: `KALAN 41 SAAT`. |
-| **Banka ATM terminali** | `E` (ATM önünde) | 1992 yeşil CRT ekranı. Bakiye ve borç görüntüleme. *(v1'deki "Fleeca" GTA V'e ait; kaldırıldı.)* |
-| **MDT araç bilgisayarı** | `TAB` (araç içinde) | Ray'in sivil DEA Premier'ında. Plaka sorgulama, şüpheli veritabanı, devriye anonsları, teslim edilen kanıt kaydı. |
-| **Etkileşim** | `E` | Üst/araç arama, kelepçeleme, araca bindirme |
+| **Banka ATM terminali** | `T` (ATM önünde) | 1992 yeşil CRT ekranı. Bakiye ve borç görüntüleme. *(v1'deki "Fleeca" GTA V'e ait; kaldırıldı.)* |
+| **MDT araç bilgisayarı** | `M` (araç içinde) *(TAB, SA'nın "telefona cevap ver" tuşu)* | Ray'in sivil DEA Premier'ında. Plaka sorgulama, şüpheli veritabanı, devriye anonsları, teslim edilen kanıt kaydı. |
+| **Etkileşim** | `T` *(E, SA'nın "sonraki silah" / "sağa bak" tuşu)* | Üst/araç arama, kelepçeleme, araca bindirme |
 | **Kader kararı** | `Y` / `N` | SA'nın kendi evet/hayır tuşları. Çakışma yok, oyunun diline uyuyor. |
 
 ---
@@ -108,8 +108,8 @@ v1'de "Şeref Puanı" ve "Yozlaşma Seviyesi" ayrı ayrı geçiyordu. v2'de **te
 
 ### 3.4 Çekirdek polis mekanikleri
 
-* **Üst ve araç arama (`E`):** Şüpheli duvara/araca yaslanır. Sonuç olasılıkları: %70 teslim olur, %20 koşarak kaçar, %10 silah çeker. **Bu olasılıklar sadece serbest devriyede geçerli**; hikâye sahnelerinde sonuç senaryoya bağlıdır.
-* **Yaya kovalamaca ve teslim olma:** Kaçamayacağını anlayan şüpheli ellerini kaldırıp diz çöker. `E` ile kelepçelenir, araca bindirilir, büroya teslim edilince prim ödenir.
+* **Üst ve araç arama (`T`):** Şüpheli duvara/araca yaslanır. Sonuç olasılıkları: %70 teslim olur, %20 koşarak kaçar, %10 silah çeker. **Bu olasılıklar sadece serbest devriyede geçerli**; hikâye sahnelerinde sonuç senaryoya bağlıdır.
+* **Yaya kovalamaca ve teslim olma:** Kaçamayacağını anlayan şüpheli ellerini kaldırıp diz çöker. `T` ile kelepçelenir, araca bindirilir, büroya teslim edilince prim ödenir.
 * **Orantısız güç kuralı:** Silahsız kaçan şüpheliye ateş etmek yasak. Cezası Bölüm 3.3'te.
 * **Zengin bölge şikâyet riski (Rodeo / Vinewood / Mulholland):** Üstünden bir şey çıkmayan sivili aramak %10–15 ihtimalle şikâyete dönüşür.
 * **İleri aşama (Yozlaşmış Yol):** İç İşleri'ne rüşvet, yargı bağlantıları, video kiralama dükkânı (VHS) üzerinden para aklama, All Saints ve kilise bağışlarıyla "hayırsever kahraman" imajı.
@@ -208,7 +208,7 @@ v1'de "Şeref Puanı" ve "Yozlaşma Seviyesi" ayrı ayrı geçiyordu. v2'de **te
 * **Ray:** *"DEA! Duvara yaslan, ellerini görebileceğim yere koy!"*
 * **Şüpheli:** *"Hey hey! Yanlış adamla uğraşıyorsun ahbap, ben sadece bekliyorum!"*
 
-*(Ray `E`'ye basar, arama animasyonu başlar. **Senaryolu an:** şüpheli Ray'i itip kaçar.)*
+*(Ray `T`'ye basar, arama animasyonu başlar. **Senaryolu an:** şüpheli Ray'i itip kaçar.)*
 
 * **Şüpheli:** *"Beni asla yakalayamazsın domuz!"* `[AÇIK: v1'deki ırkçı hakaret değiştirildi, bkz. Bölüm 6]`
 * **Ray:** *(Arkasından koşarak)* *"Dur! Kaçma!"*
@@ -276,7 +276,7 @@ v1'de "Şeref Puanı" ve "Yozlaşma Seviyesi" ayrı ayrı geçiyordu. v2'de **te
 * **Şüpheli 2:** *"Kahretsin!"* *(Arka pencereden atlayıp kaçar)*
 * **Ray:** *"Pencereden kaçtı! Ben peşindeyim Miller, sen odayı emniyete al!"*
 
-*(Kovalamaca. Şüpheli çıkmaz sokakta ellerini kaldırıp diz çöker. Ray `E` ile kelepçeler, araca bindirir.)*
+*(Kovalamaca. Şüpheli çıkmaz sokakta ellerini kaldırıp diz çöker. Ray `T` ile kelepçeler, araca bindirir.)*
 
 *(Ray odaya döner. Yatağın altında kanıt listesine girmemiş **$100 kayıt dışı nakit** bulur.)*
 
@@ -425,7 +425,9 @@ v1'de "Şeref Puanı" ve "Yozlaşma Seviyesi" ayrı ayrı geçiyordu. v2'de **te
 | Rüşvet | $500,000'in tamamı | $50,000 çanta, $450,000 teslim | Kartelin tüm sevkiyatı vermesi inandırıcı değildi; eksik para Bölüm 3'e kanca oluyor |
 | Tenpenny | Sadece kader ekranında | Bölüm 1'de kısa görünüm + Teğmen'in "bordro" iması | Hiç tanıtılmadan çıkıyordu |
 | Kader ekranı | "Ameliyat faturası" | "Kemoterapi ön ödemesi" | Tedavi kemoterapi |
-| Defter tuşu | N | B (geçici) | N, SA'nın "Hayır" tuşu ve kader ekranı da N kullanıyor |
+| Defter tuşu | N | B | N, SA'nın "Hayır" tuşu ve kader ekranı da N kullanıyor |
+| Etkileşim / ATM tuşu | E | T | E, SA'da yürürken "sonraki silah", araçta "sağa bak" |
+| MDT tuşu | TAB | M | TAB, SA'nın "telefona cevap ver" tuşu |
 | Telefon | Arama + SMS | Sadece arama; mesajlar pager'da | 1992'de tüketici SMS'i yoktu |
 | Diyalog | "Sarah annen", "Danny'ye mukayyet ol", "Dur yoksa ateş edeceğim" | "annen", "Danny'yi okula ben bırakırım", "Dur! Kaçma!" | Doğal olmayan / mekanikle çelişen replikler |
 | Yazım | "B Barksdale", "Aklana" | Düzeltildi | — |

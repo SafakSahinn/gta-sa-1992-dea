@@ -6,6 +6,7 @@ A story mod for GTA San Andreas. Los Santos, 1992: DEA agent Raymond Cross needs
 
 - Design document: [docs/GDD.md](docs/GDD.md) · Turkish: [docs/tr/GDD.md](docs/tr/GDD.md)
 - Recorded locations: [docs/LOCATIONS.md](docs/LOCATIONS.md)
+- Controls and SA default bindings: [docs/CONTROLS.md](docs/CONTROLS.md)
 
 ## Languages
 
@@ -41,3 +42,4 @@ Scripts live in `scripts/` as [Sanny Builder 4](https://github.com/sannybuilder/
 |---|---|
 | `dea_hello` | Installation check — press F7 to show "RAY CROSS - DEA" |
 | `dev_locator` | Developer tool — F8 position overlay, F9 appends the position to `cleo\dea_locations.txt`, F10 teleports through the project locations |
+| `dev_controls_dump` | Developer tool — writes the game's current key bindings to `cleo\dea_controls.txt` once after loading |

@@ -33,17 +33,17 @@
 
 ## 2. IN-GAME EQUIPMENT AND UI
 
-> All keys are **provisional**; they will be finalized in Phase 1 after a conflict test against SA's default controls.
+> Keys were checked in Phase 1 against the bindings read from the game's memory (`dev_controls_dump`, see [CONTROLS.md](CONTROLS.md)). Every mod key below is unbound in SA's defaults.
 
-| Equipment | Key (provisional) | Purpose |
+| Equipment | Key | Purpose |
 |---|---|---|
 | **Field Notebook** | `B` *(was N in v1 — N is SA's "No" key)* | Leather-bound, handwritten notebook. Page 1: radio calls and case notes. Page 2: suspect and informant statements. Page 3: personal notes and the debt list. |
 | **Brick Phone** (Motorola MicroTAC 9800X) | `P` | **Voice calls only**: Sarah, Danny, Chief Garcia, Miller, Dr. Evans, Slick. *(Consumer SMS did not exist in 1992; written messages moved to the pager.)* |
 | **Pager** | automatic | Hospital and office messages. Upper case, ASCII only: `41 HOURS LEFT`. |
-| **Bank ATM terminal** | `E` (at an ATM) | 1992 green CRT screen. Balance and debt display. *(v1's "Fleeca" is a GTA V brand; removed.)* |
-| **MDT car computer** | `TAB` (in vehicle) | In Ray's unmarked DEA Premier. Plate lookup, suspect database, patrol calls, evidence log. |
-| **Interact** | `E` | Frisk / vehicle search, cuffing, putting a suspect in the car |
-| **Fate decision** | `Y` / `N` | SA's own yes/no keys. No conflict — fits the game's own language. |
+| **Bank ATM terminal** | `T` (at an ATM) | 1992 green CRT screen. Balance and debt display. *(v1's "Fleeca" is a GTA V brand; removed.)* |
+| **MDT car computer** | `M` (in vehicle) *(TAB is SA's "answer phone")* | In Ray's unmarked DEA Premier. Plate lookup, suspect database, patrol calls, evidence log. |
+| **Interact** | `T` *(E is SA's "next weapon" / "look right")* | Frisk / vehicle search, cuffing, putting a suspect in the car |
+| **Fate decision** | `Y` / `N` | SA's own "conversation yes/no" keys, only active in conversations — reusing them on our own decision screen fits the game's language. |
 
 ---
 
@@ -109,8 +109,8 @@ v1 used "Honor Points" and "Corruption Level" side by side. v2 has **one variabl
 
 ### 3.4 Core police mechanics
 
-* **Frisk and vehicle search (`E`):** The suspect leans against a wall/car. Outcome odds: 70% surrenders, 20% runs, 10% draws a weapon. **These odds apply only during free patrol**; story scenes have scripted outcomes.
-* **Foot chase and surrender:** A suspect who realizes he can't escape raises his hands and kneels. `E` cuffs him and puts him in the car; turning him in at the office pays the bonus.
+* **Frisk and vehicle search (`T`):** The suspect leans against a wall/car. Outcome odds: 70% surrenders, 20% runs, 10% draws a weapon. **These odds apply only during free patrol**; story scenes have scripted outcomes.
+* **Foot chase and surrender:** A suspect who realizes he can't escape raises his hands and kneels. `T` cuffs him and puts him in the car; turning him in at the office pays the bonus.
 * **Use of force policy:** Shooting an unarmed fleeing suspect is forbidden. Penalty in Section 3.3.
 * **Rich district complaint risk (Rodeo / Vinewood / Mulholland):** Searching a civilian who turns out clean has a 10–15% chance of a complaint.
 * **Later stage (Corrupt Path):** Bribing Internal Affairs, judicial connections, laundering money through a video rental store (VHS), "philanthropic hero" image via donations to All Saints and the church.
@@ -211,7 +211,7 @@ Coordinates are recorded in [`LOCATIONS.md`](LOCATIONS.md).
 * **Ray:** *"DEA! Against the wall, hands where I can see them!"*
 * **Suspect:** *"Whoa whoa! You got the wrong guy, man, I'm just waitin' here!"*
 
-*(Ray presses `E`, the frisk animation starts. **Scripted moment:** the suspect shoves Ray and runs.)*
+*(Ray presses `T`, the frisk animation starts. **Scripted moment:** the suspect shoves Ray and runs.)*
 
 * **Suspect:** *"You'll never catch me, pig!"* `[OPEN: v1's racial slur was replaced, see Section 6]`
 * **Ray:** *(Running after him)* *"Stop! Don't run!"*
@@ -279,7 +279,7 @@ Coordinates are recorded in [`LOCATIONS.md`](LOCATIONS.md).
 * **Suspect 2:** *"Damn it!"* *(Jumps out of the back window and runs)*
 * **Ray:** *"He went out the window! I got him, Miller — you secure the room!"*
 
-*(Chase. The suspect raises his hands in a dead end and kneels. Ray cuffs him with `E` and puts him in the car.)*
+*(Chase. The suspect raises his hands in a dead end and kneels. Ray cuffs him with `T` and puts him in the car.)*
 
 *(Ray returns to the room. Under the bed he finds **$100 in undeclared cash** that never made it onto the evidence list.)*
 
@@ -428,7 +428,9 @@ Coordinates are recorded in [`LOCATIONS.md`](LOCATIONS.md).
 | Bribe | The whole $500,000 | $50,000 bag, $450,000 turned in | The cartel handing over the whole shipment wasn't believable; the missing money hooks Chapter 3 |
 | Tenpenny | Only on the fate screen | Cameo in Chapter 1 + the lieutenant's "payroll" hint | Appeared without introduction |
 | Fate screen | "Surgery bill" | "Chemotherapy down payment" | The treatment is chemotherapy |
-| Notebook key | N | B (provisional) | N is SA's "No" key and the fate screen also uses N |
+| Notebook key | N | B | N is SA's "No" key and the fate screen also uses N |
+| Interact / ATM key | E | T | E is SA's "next weapon" (on foot) and "look right" (in vehicle) |
+| MDT key | TAB | M | TAB is SA's "answer phone" |
 | Phone | Calls + SMS | Calls only; messages on the pager | No consumer SMS in 1992 |
 | Dialogue | Unnatural lines / lines contradicting mechanics | Rewritten | — |
 | Typos | "B Barksdale", "Aklana" | Fixed | — |
