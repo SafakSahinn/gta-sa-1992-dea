@@ -1,26 +1,43 @@
 # GTA SA: 1992 DEA
 
-GTA San Andreas için hikâye modu. 1992 Los Santos'ta DEA ajanı Raymond Cross, eşinin kanser tedavisi için gereken parayı bulmaya çalışırken rozetiyle vicdanı arasında kalır.
+A story mod for GTA San Andreas. Los Santos, 1992: DEA agent Raymond Cross needs $12,500 by Friday for his wife's cancer treatment — and the only legal way to earn it pays $15 a package. Somewhere between his badge and his conscience, a cartel lieutenant is waiting with a bag of cash.
 
-Tasarım belgesi: [docs/GDD.md](docs/GDD.md) · Mekân konumları: [docs/KONUMLAR.md](docs/KONUMLAR.md)
+> **Status:** early development (Phase 1 of 8). Nothing playable yet beyond developer tools.
 
-## Gereksinimler
+- Design document: [docs/GDD.md](docs/GDD.md) · Turkish: [docs/tr/GDD.md](docs/tr/GDD.md)
+- Recorded locations: [docs/LOCATIONS.md](docs/LOCATIONS.md)
 
-- GTA San Andreas **v1.0 US**
-- CLEO 5 (Ultimate ASI Loader ile)
-- SilentPatch, Mod Loader (önerilir)
+## Languages
 
-## Geliştirme
+English is the primary language of the code and the game. Turkish dialogue is planned as an additional localization.
 
-Scriptler `scripts/` altında Sanny Builder 4 kaynak dosyaları (`.txt`) olarak durur.
+## Requirements
 
-```powershell
-powershell -ExecutionPolicy Bypass -File build.ps1
-```
+- GTA San Andreas **v1.0 US** (Steam / Rockstar Launcher copies must be downgraded)
+- [CLEO 5](https://github.com/cleolibrary/CLEO5) with an ASI loader
+- [SilentPatch](https://github.com/CookiePLMonster/SilentPatch) (recommended)
 
-Bu komut her scripti derleyip `.cs` dosyasını oyunun `cleo` klasörüne kopyalar. Derlenen dosyalar repoya eklenmez (`build/`).
+## Building
 
-| Script | Ne yapar |
+Scripts live in `scripts/` as [Sanny Builder 4](https://github.com/sannybuilder/dev) sources (`.txt`); shared files in `scripts/include/` are pulled in with `{$INCLUDE}`.
+
+1. Tell the build where your game and Sanny Builder are — create `build.local.ps1` (not committed):
+   ```powershell
+   $GameDir  = 'C:\Games\GTA San Andreas'
+   $SannyExe = 'C:\Tools\SannyBuilder\sanny.exe'
+   ```
+   or set the `GTASA_DIR` / `SANNY_EXE` environment variables, or pass `-GameDir` / `-SannyExe`.
+2. Run:
+   ```powershell
+   powershell -ExecutionPolicy Bypass -File build.ps1
+   ```
+   Every script is compiled into `build/` and the `.cs` file is copied into the game's `cleo` folder. Compiled files are not committed.
+
+> **Sanny Builder pitfall:** the command-line compiler can silently drop lines — e.g. a variable named after a built-in class (`hud`, `file`, `zone`...) or an unrecognized enum constant. Use compound camelCase names and verify important scripts with `sanny.exe --no-splash --mode sa_sbl --decompile in.cs out.txt`.
+
+## Scripts
+
+| Script | Purpose |
 |---|---|
-| `dea_merhaba` | F7'ye basınca ekranda "RAY CROSS - DEA" yazar (kurulum testi) |
-| `dea_konum` | Geliştirme aracı. F8 koordinat göstergesini açar/kapatır, F9 konumu `cleo\dea_konumlar.txt` dosyasına ekler |
+| `dea_hello` | Installation check — press F7 to show "RAY CROSS - DEA" |
+| `dev_locator` | Developer tool — F8 position overlay, F9 appends the position to `cleo\dea_locations.txt`, F10 teleports through the project locations |

@@ -1,10 +1,9 @@
-// Faz 0 - ilk script
-// Oyunda F7'ye basinca ekranin ortasinda "RAY CROSS - DEA" yazar.
+// Installation check: press F7 in game to show "RAY CROSS - DEA".
 {$CLEO .cs}
 
-script_name {name} 'deamrhb'
+script_name {name} 'deahelo'
 
-wait {time} 3000 // oyunun yuklenmesini bekle
+wait {time} 3000 // let the game finish loading
 
 while true
     wait {time} 0
@@ -14,7 +13,7 @@ while true
     then
         print_string_now {text} "RAY CROSS - DEA" {time} 3000
 
-        // tus birakilana kadar bekle, yoksa her karede tekrar yazar
+        // wait for key release, otherwise it would fire every frame
         while is_key_pressed {keyCode} 0x76
             wait {time} 0
         end

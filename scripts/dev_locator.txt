@@ -1,0 +1,143 @@
+// Development tool (not shipped): collects coordinates for scripts/include/locations.txt
+// F8  - toggle the on-screen position overlay
+// F9  - append the current position to cleo\dea_locations.txt
+// F10 - teleport to the next project location (1 -> 6 -> 1)
+{$CLEO .cs}
+{$INCLUDE include\locations.txt}
+
+script_name {name} 'devloct'
+
+int overlayOn = 0
+int saveCount = 0
+int targetIndex = 0
+float posX, posY, posZ, playerHeading
+int areaId, clockHours, clockMinutes, logHandle
+string zoneName
+
+wait {time} 3000
+
+while true
+    wait {time} 0
+
+    if
+        not is_player_playing $player1
+    then
+        continue
+    end
+
+    // F8: toggle overlay
+    if
+        is_key_pressed {keyCode} 0x77
+    then
+        if
+            overlayOn == 0
+        then
+            overlayOn = 1
+        else
+            overlayOn = 0
+            clear_prints
+        end
+        while is_key_pressed {keyCode} 0x77
+            wait {time} 0
+        end
+    end
+
+    posX, posY, posZ = get_char_coordinates $scplayer
+    playerHeading = get_char_heading $scplayer
+    areaId = get_area_visible
+    zoneName = get_name_of_info_zone {pos} posX posY posZ
+
+    if
+        overlayOn == 1
+    then
+        print_formatted_now {format} "X %.2f  Y %.2f  Z %.2f~n~HEADING %.1f  INT %d  %s" {time} 100 posX posY posZ playerHeading areaId zoneName
+    end
+
+    // F9: append position to file
+    if
+        is_key_pressed {keyCode} 0x78
+    then
+        clockHours, clockMinutes = get_time_of_day
+        if
+            logHandle = open_file {filePathName} "cleo:\dea_locations.txt" {mode} "at" // append (FileMode enum is not recognized by the compiler)
+        then
+            saveCount += 1
+            write_formatted_string_to_file {self} logHandle {format} "#%d  %.2f %.2f %.2f  heading %.1f  int %d  %s  time %02d:%02d%c%c" saveCount posX posY posZ playerHeading areaId zoneName clockHours clockMinutes 13 10
+            close_file {self} logHandle
+            print_formatted_now {format} "~g~LOCATION SAVED #%d~s~ (%s)" {time} 2000 saveCount zoneName
+        else
+            print_string_now {text} "~r~COULD NOT OPEN FILE" {time} 2000
+        end
+        while is_key_pressed {keyCode} 0x78
+            wait {time} 0
+        end
+    end
+
+    // F10: teleport to the next project location
+    if
+        is_key_pressed {keyCode} 0x79
+    then
+        if
+            is_char_in_any_car $scplayer
+        then
+            print_string_now {text} "~r~LEAVE THE VEHICLE FIRST" {time} 2000
+        else
+            targetIndex += 1
+            if
+                targetIndex > 6
+            then
+                targetIndex = 1
+            end
+            if
+                targetIndex == 1
+            then
+                TELEPORT_TO(HOME_X, HOME_Y)
+                print_string_now {text} "~y~1/6 CROSS HOUSE~s~ - Jefferson" {time} 5000
+            end
+            if
+                targetIndex == 2
+            then
+                TELEPORT_TO(OFFICE_EXT_X, OFFICE_EXT_Y)
+                print_string_now {text} "~y~2/6 LSPD/DEA OFFICE~s~ - Pershing Square" {time} 5000
+            end
+            if
+                targetIndex == 3
+            then
+                TELEPORT_TO(GAS_STATION_X, GAS_STATION_Y)
+                print_string_now {text} "~y~3/6 IDLEWOOD GAS STATION~s~" {time} 5000
+            end
+            if
+                targetIndex == 4
+            then
+                TELEPORT_TO(HOSPITAL_X, HOSPITAL_Y)
+                print_string_now {text} "~y~4/6 ALL SAINTS GENERAL~s~ - Market" {time} 5000
+            end
+            if
+                targetIndex == 5
+            then
+                TELEPORT_TO(MOTEL_EXT_X, MOTEL_EXT_Y)
+                print_string_now {text} "~y~5/6 JEFFERSON MOTEL~s~" {time} 5000
+            end
+            if
+                targetIndex == 6
+            then
+                TELEPORT_TO(DOCKS_X, DOCKS_Y)
+                print_string_now {text} "~y~6/6 OCEAN DOCKS~s~" {time} 5000
+            end
+        end
+        while is_key_pressed {keyCode} 0x79
+            wait {time} 0
+        end
+    end
+end
+
+
+// Moves the player to the given point outside; z = -100 makes the game find the ground itself
+function TELEPORT_TO(destX: float, destY: float)
+    set_area_visible {areaId} 0
+    set_char_area_visible $scplayer {areaId} 0
+    load_scene {pos} destX destY 20.0
+    request_collision {pos} destX destY
+    set_char_coordinates $scplayer {pos} destX destY -100.0
+    set_camera_behind_player
+end

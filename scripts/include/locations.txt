@@ -1,0 +1,49 @@
+// Project locations - every script reads coordinates ONLY from this file.
+// Recorded in-game with dev_locator (F9) on 2026-09-23. See docs/LOCATIONS.md
+// *_INT_ID = interior (area) id, 0 = outside world. *_HEADING = degrees, 0 = north.
+
+const
+    // 1 - Cross family house, Jefferson (front door)
+    HOME_X = 2191.52
+    HOME_Y = -1275.61
+    HOME_Z = 25.16
+    HOME_HEADING = 2.5
+
+    // 2 - LSPD/DEA office, Pershing Square
+    OFFICE_EXT_X = 1553.53
+    OFFICE_EXT_Y = -1674.94
+    OFFICE_EXT_Z = 16.20
+    OFFICE_EXT_HEADING = 267.9
+    OFFICE_INT_X = 246.78
+    OFFICE_INT_Y = 63.90
+    OFFICE_INT_Z = 1003.64
+    OFFICE_INT_ID = 6
+
+    // 3 - Behind the Idlewood gas station
+    GAS_STATION_X = 1904.32
+    GAS_STATION_Y = -1795.20
+    GAS_STATION_Z = 13.54
+    GAS_STATION_HEADING = 273.8
+
+    // 4 - All Saints General Hospital entrance, Market (no interior)
+    HOSPITAL_X = 1177.39
+    HOSPITAL_Y = -1323.29
+    HOSPITAL_Z = 14.07
+    HOSPITAL_HEADING = 98.0
+
+    // 5 - Jefferson Motel
+    MOTEL_EXT_X = 2231.42
+    MOTEL_EXT_Y = -1159.67
+    MOTEL_EXT_Z = 25.83
+    MOTEL_EXT_HEADING = 269.4
+    MOTEL_INT_X = 2240.04
+    MOTEL_INT_Y = -1170.66
+    MOTEL_INT_Z = 1029.80
+    MOTEL_INT_ID = 15
+
+    // 6 - Ocean Docks, container yard
+    DOCKS_X = 2781.21
+    DOCKS_Y = -2542.61
+    DOCKS_Z = 13.64
+    DOCKS_HEADING = 91.4
+end

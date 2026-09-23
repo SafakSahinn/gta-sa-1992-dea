@@ -1,429 +1,435 @@
-# GTA SA: 1992 DEA Mod — Proje Tasarım Belgesi v2
+# GTA SA: 1992 DEA Mod — Game Design Document v2
 
-> **v2 notu (2026-09-23):** Bu sürüm, v1'deki (`gta-sa-1992-dea-mod-detayli-gdd.md`) hikâyeyi ve diyalogları korur; coğrafya, para, zaman çizelgesi, tuş ve kurgu tutarsızlıkları düzeltilmiştir. Yapılan her değişiklik **Bölüm 7 — Değişiklik Kaydı**'nda listelenir. Henüz karar verilmemiş konular **Bölüm 6 — Açık Kararlar**'dadır ve metinde `[AÇIK]` etiketiyle işaretlidir.
+> **Language:** English is the primary language of this project. A Turkish version of this document (and of the in-game dialogue) lives in [`docs/tr/GDD.md`](tr/GDD.md).
+>
+> **v2 note (2026-09-23):** v2 keeps the story and dialogue of v1 and fixes its geography, money, timeline, key-binding and plot inconsistencies. Every change is listed in **Section 7 — Changelog**. Undecided topics are in **Section 6 — Open Decisions** and marked `[OPEN]` in the text.
 
 ---
 
-## 1. TEMEL ÇERÇEVE
+## 1. CORE FRAMEWORK
 
-| Başlık | Karar |
+| Topic | Decision |
 |---|---|
-| Oyun | GTA San Andreas (PC, v1.0 US — mod uyumluluğu için) |
-| Harita | Oyunun **orijinal haritası**. Bölüm 1–2 tamamen **Los Santos**'ta geçer. (Project Eagle, eyaletler arası bölümler için ileride değerlendirilecek.) |
-| Dönem | 1992 — CJ'in hikâyesiyle aynı yıl, aynı şehir |
-| Teknik altyapı | **CLEO scriptleri** (Sanny Builder ile). Orijinal `main.scm`'ye dokunulmaz. |
-| Kanon bağı | Ballas (sokak), Loco Syndicate'in tedarikçi karteli (sevkiyat), Frank Tenpenny / C.R.A.S.H. (yozlaşmış yolun kapısı) |
+| Game | GTA San Andreas (PC, v1.0 US — for mod compatibility) |
+| Map | The game's **original map**. Chapters 1–2 take place entirely in **Los Santos**. (Project Eagle may be evaluated later for interstate chapters.) |
+| Era | 1992 — the same year and city as CJ's story |
+| Tech stack | **CLEO scripts** written in Sanny Builder. The original `main.scm` is not touched. |
+| Canon ties | Ballas (street level), the cartel supplying the Loco Syndicate (shipments), Frank Tenpenny / C.R.A.S.H. (the door to the corrupt path) |
+| Languages | English (primary). Turkish dialogue as an additional localization. |
 
-### 1.1 Karakter Kadrosu
+### 1.1 Cast
 
-* **Raymond "Ray" Cross (35):** DEA ajanı. Rozetine ve kanunlara sadık, sistemin yıprattığı, ailesini korumak için her şeyi göze alabilecek dürüst bir baba. `[AÇIK: etnik köken]`
-* **Sarah Cross (33):** Ray'in eşi. **Akciğer kanseri.** All Saints General Hospital'da deneysel kemoterapi protokolü için **Cuma 10:00'a kadar $12,500 ön ödeme** gerekiyor. Ray'in federal sağlık sigortası bu protokolü "deneysel tedavi, kapsam dışı" gerekçesiyle reddetti.
-* **Danny Cross (10):** Oğulları. Babasını kahramanı olarak görür; annesinin hastalığı yüzünden erken olgunlaşmıştır.
-* **Ajan Miller:** Ray'in dürüst ve sadık ortağı.
-* **Amir Garcia:** LSPD/DEA Ortak Görev Gücü amiri. Eyalet, görev gücü fonunu %20 kestiği için çaresiz.
-* **Dr. Evans:** All Saints General Hospital'da Sarah'ın doktoru.
-* **Slick:** Idlewood/Jefferson hattında sokak muhbiri ($20 karşılığı bilgi satar).
-* **Kartel Teğmeni:** Loco Syndicate'e mal sağlayan kartelin Ocean Docks sorumlusu. Ballas'ın toptancısı.
-* **Frank Tenpenny (kanon, kamera arkası):** C.R.A.S.H. memuru. Bölüm 1'de kısa bir görünüm yapar; Yozlaşmış Yol'da Ray'i piyonu yapar.
-
----
-
-## 2. OYUN İÇİ DONANIM VE ARAYÜZ
-
-> Tuşların hepsi **geçicidir**; Faz 1'de SA'nın varsayılan kontrolleriyle çakışma testi yapılıp kesinleşecek.
-
-| Donanım | Tuş (geçici) | İşlevi |
-|---|---|---|
-| **Polis Cep Defteri** | `B` *(v1'de N idi — N, SA'nın "Hayır" tuşu)* | Deri kaplı, el yazısı defter. Sayfa 1: telsiz anonsları ve vaka notları. Sayfa 2: şüpheli ve muhbir ifadeleri. Sayfa 3: kişisel notlar ve borç listesi. |
-| **Tuğla Telefon** (Motorola MicroTAC 9800X) | `P` | Sadece **sesli arama**: Sarah, Danny, Amir Garcia, Miller, Dr. Evans, Slick. *(1992'de tüketici SMS'i yoktu; yazılı mesajlar pager'a taşındı.)* |
-| **Pager** | otomatik | Hastane ve büro mesajları. Ekran büyük harf ve Türkçe karaktersiz: `KALAN 41 SAAT`. |
-| **Banka ATM terminali** | `E` (ATM önünde) | 1992 yeşil CRT ekranı. Bakiye ve borç görüntüleme. *(v1'deki "Fleeca" GTA V'e ait; kaldırıldı.)* |
-| **MDT araç bilgisayarı** | `TAB` (araç içinde) | Ray'in sivil DEA Premier'ında. Plaka sorgulama, şüpheli veritabanı, devriye anonsları, teslim edilen kanıt kaydı. |
-| **Etkileşim** | `E` | Üst/araç arama, kelepçeleme, araca bindirme |
-| **Kader kararı** | `Y` / `N` | SA'nın kendi evet/hayır tuşları. Çakışma yok, oyunun diline uyuyor. |
+* **Raymond "Ray" Cross (35):** DEA agent. Loyal to his badge and the law, worn down by the system, an honest father ready to risk everything for his family. `[OPEN: ethnicity]`
+* **Sarah Cross (33):** Ray's wife. **Lung cancer.** An experimental chemotherapy protocol at All Saints General Hospital requires a **$12,500 down payment by Friday 10:00**. Ray's federal health insurance rejected the protocol as "experimental treatment, not covered."
+* **Danny Cross (10):** Their son. Sees his father as a hero; forced to grow up early by his mother's illness.
+* **Agent Miller:** Ray's honest, loyal partner.
+* **Chief Garcia:** Head of the LSPD/DEA Joint Task Force. Powerless since the state cut the task force budget by 20%.
+* **Dr. Evans:** Sarah's physician at All Saints General Hospital.
+* **Slick:** Street informant on the Idlewood/Jefferson beat (sells information for $20).
+* **Cartel Lieutenant:** Ocean Docks man of the cartel that supplies the Loco Syndicate — the Ballas' wholesaler.
+* **Frank Tenpenny (canon, behind the scenes):** C.R.A.S.H. officer. Brief appearance in Chapter 1; on the Corrupt Path he turns Ray into his pawn.
 
 ---
 
-## 3. EKONOMİ, ZAMAN VE AHLAK SİSTEMLERİ
+## 2. IN-GAME EQUIPMENT AND UI
 
-### 3.1 Para (ilk sürümde tek "bakiye")
+> All keys are **provisional**; they will be finalized in Phase 1 after a conflict test against SA's default controls.
 
-| Kalem | Tutar | Not |
+| Equipment | Key (provisional) | Purpose |
 |---|---|---|
-| Başlangıç bakiyesi | **$450** | Çarşamba sabahı |
-| Haftalık net maaş | **$950** | Pazartesi yatar, yani son ödeme gününden **sonra** |
-| Ev ipoteği | **-$850** | Pazartesi maaşından kesilecek |
-| Faturalar | **-$120** | Pazartesi |
-| Hastane ön ödemesi | **-$12,500** | **Cuma 10:00** son gün |
-| Yasal kanıt primi | **$15–20 / paket** | Amir Garcia'nın uygulayabildiği tek ödeme |
+| **Field Notebook** | `B` *(was N in v1 — N is SA's "No" key)* | Leather-bound, handwritten notebook. Page 1: radio calls and case notes. Page 2: suspect and informant statements. Page 3: personal notes and the debt list. |
+| **Brick Phone** (Motorola MicroTAC 9800X) | `P` | **Voice calls only**: Sarah, Danny, Chief Garcia, Miller, Dr. Evans, Slick. *(Consumer SMS did not exist in 1992; written messages moved to the pager.)* |
+| **Pager** | automatic | Hospital and office messages. Upper case, ASCII only: `41 HOURS LEFT`. |
+| **Bank ATM terminal** | `E` (at an ATM) | 1992 green CRT screen. Balance and debt display. *(v1's "Fleeca" is a GTA V brand; removed.)* |
+| **MDT car computer** | `TAB` (in vehicle) | In Ray's unmarked DEA Premier. Plate lookup, suspect database, patrol calls, evidence log. |
+| **Interact** | `E` | Frisk / vehicle search, cuffing, putting a suspect in the car |
+| **Fate decision** | `Y` / `N` | SA's own yes/no keys. No conflict — fits the game's own language. |
 
-> Pazartesi maaşı ($950), ipotek ve faturayı ($970) bile karşılamıyor. Oyuncu "maaşı bekleyip ödeyeyim" yolunun kapalı olduğunu ilk ATM ekranında görür.
+---
 
-**Yasal yolla bakiye akışı (dürüst oynayan oyuncu):**
+## 3. ECONOMY, TIME AND MORALITY SYSTEMS
 
-| An | Olay | Değişim | Bakiye |
+### 3.1 Money (a single "balance" in the first release)
+
+| Item | Amount | Note |
+|---|---|---|
+| Starting balance | **$450** | Wednesday morning |
+| Weekly net salary | **$950** | Paid Monday — i.e. **after** the deadline |
+| Mortgage | **-$850** | Deducted from Monday's salary |
+| Bills | **-$120** | Monday |
+| Hospital down payment | **-$12,500** | Deadline **Friday 10:00** |
+| Legal evidence bonus | **$15–20 per package** | The only payment Chief Garcia can authorize |
+
+> Monday's salary ($950) doesn't even cover the mortgage and bills ($970). The very first ATM screen shows the player that "wait for payday" is not an option.
+
+**Balance flow on the legal path (an honest player):**
+
+| When | Event | Change | Balance |
 |---|---|---|---|
-| Çar 07:30 | Başlangıç | — | **$450** |
-| Çar 10:15 | Idlewood: 3 crack tüpü teslim (3 × $15) | +$45 | **$495** |
-| Çar 14:30 | Slick'e muhbir parası | -$20 | **$475** |
-| Çar 15:15 | Motel baskını primi | +$85 | $560 |
-| Çar 15:15 | $100 ahlak testi → [B] kanıta koy (bildirim primi) | +$15 | **$575** |
-| Perşembe | Serbest devriye (oyuncuya göre) | +$100–250 | ~$700–825 |
-| Per 22:45 | Ocean Docks | — | $12,500'a hâlâ ~$11,700 eksik |
+| Wed 07:30 | Start | — | **$450** |
+| Wed 10:15 | Idlewood: 3 crack vials turned in (3 × $15) | +$45 | **$495** |
+| Wed 14:30 | Paying Slick | -$20 | **$475** |
+| Wed 15:15 | Motel raid bonus | +$85 | $560 |
+| Wed 15:15 | $100 morality test → [B] bag it (reporting bonus) | +$15 | **$575** |
+| Thursday | Free patrol (player-dependent) | +$100–250 | ~$700–825 |
+| Thu 22:45 | Ocean Docks | — | still ~$11,700 short of $12,500 |
 
-* Şüpheliden çıkan **$45 kayıt dışı nakit kanıttır**, Ray'e geçmez.
-* [A] seçilirse (parayı cebe at): $475 + $85 + $100 = **$660**, Yozlaşma +2.
-* Sahne notları ve defter yazıları bakiyeyi **değişkenden** okur, sabit rakam yazılmaz.
+* The **$45 undeclared cash** found on the suspect is **evidence** and does not go to Ray.
+* If [A] is chosen (pocket the money): $475 + $85 + $100 = **$660**, Corruption +2.
+* Scene notes and notebook entries read the balance **from a variable**; no hard-coded amounts.
 
-### 3.2 Zaman çizelgesi ve geri sayım
+### 3.2 Timeline and countdown
 
-**Son gün: Cuma 10:00.** Bütün pager mesajları bu ana göre hesaplanır.
+**Deadline: Friday 10:00.** Every pager message is computed from it.
 
-| An | Kalan süre | Pager metni |
+| When | Time left | Pager text |
 |---|---|---|
-| Çar 10:15 | 47 sa 45 dk | `ALL SAINTS: SARAH CROSS ODEME YOK. SON GUN CUMA 10:00` |
-| Çar 16:30 | 41 sa 30 dk | `ALL SAINTS: KALAN 41 SAAT. $12,500 ODENMEDI` |
-| Per 18:00 | 16 sa | `ALL SAINTS: KALAN 16 SAAT` |
-| Per 22:45 | 11 sa 15 dk | `ALL SAINTS: KALAN 11 SAAT` |
+| Wed 10:15 | 47 h 45 min | `ALL SAINTS: SARAH CROSS NO PAYMENT. DEADLINE FRI 10:00` |
+| Wed 16:30 | 41 h 30 min | `ALL SAINTS: 41 HOURS LEFT. $12,500 UNPAID` |
+| Thu 18:00 | 16 h | `ALL SAINTS: 16 HOURS LEFT` |
+| Thu 22:45 | 11 h 15 min | `ALL SAINTS: 11 HOURS LEFT` |
 
-### 3.3 Ahlak göstergesi — tek değişken: `YOZLASMA` (0–100)
+### 3.3 Morality meter — a single variable: `CORRUPTION` (0–100)
 
-v1'de "Şeref Puanı" ve "Yozlaşma Seviyesi" ayrı ayrı geçiyordu. v2'de **tek değişken** var; ekranda gösterilen "Şeref" = 100 − Yozlaşma.
+v1 used "Honor Points" and "Corruption Level" side by side. v2 has **one variable**; the "Honor" shown on screen = 100 − Corruption.
 
-| Aralık | Durum | Dünyanın tepkisi |
+| Range | State | How the world reacts |
 |---|---|---|
-| 0–24 | **Temiz** | Telsiz desteği eksiksiz |
-| 25–49 | **Gri** | Torbacılar rüşvet teklif etmeye başlar |
-| 50–74 | **Kirli** | Delil karartma seçenekleri açılır, İç İşleri ilgilenir |
-| 75–100 | **Rozetli baron** | Sokak çeteleri haraç öder |
+| 0–24 | **Clean** | Full radio backup |
+| 25–49 | **Grey** | Dealers start offering bribes |
+| 50–74 | **Dirty** | Evidence-tampering options unlock, Internal Affairs takes interest |
+| 75–100 | **Badged baron** | Street gangs pay protection |
 
-| Eylem | Etkisi |
+| Action | Effect |
 |---|---|
-| Kayıt dışı $100'ı cebe atmak | +2 |
-| Silahsız kaçan şüpheliye ateş (orantısız güç) | +5, -$300 ceza, İç İşleri soruşturması |
-| Zengin bölgede haksız arama (şikâyet çıkarsa) | -$200 ile -$350 tazminat, amir azarı (Yozlaşma değişmez) |
-| Kırılma noktası: Yozlaşmış Yol | Yozlaşma **en az 50**'ye çıkar |
+| Pocketing the undeclared $100 | +2 |
+| Shooting an unarmed fleeing suspect (excessive force) | +5, -$300 fine, Internal Affairs investigation |
+| Unjustified search in a rich district (if a complaint is filed) | -$200 to -$350 damages, reprimand from the chief (Corruption unchanged) |
+| Breaking point: Corrupt Path | Corruption rises to **at least 50** |
 
-### 3.4 Çekirdek polis mekanikleri
+### 3.4 Core police mechanics
 
-* **Üst ve araç arama (`E`):** Şüpheli duvara/araca yaslanır. Sonuç olasılıkları: %70 teslim olur, %20 koşarak kaçar, %10 silah çeker. **Bu olasılıklar sadece serbest devriyede geçerli**; hikâye sahnelerinde sonuç senaryoya bağlıdır.
-* **Yaya kovalamaca ve teslim olma:** Kaçamayacağını anlayan şüpheli ellerini kaldırıp diz çöker. `E` ile kelepçelenir, araca bindirilir, büroya teslim edilince prim ödenir.
-* **Orantısız güç kuralı:** Silahsız kaçan şüpheliye ateş etmek yasak. Cezası Bölüm 3.3'te.
-* **Zengin bölge şikâyet riski (Rodeo / Vinewood / Mulholland):** Üstünden bir şey çıkmayan sivili aramak %10–15 ihtimalle şikâyete dönüşür.
-* **İleri aşama (Yozlaşmış Yol):** İç İşleri'ne rüşvet, yargı bağlantıları, video kiralama dükkânı (VHS) üzerinden para aklama, All Saints ve kilise bağışlarıyla "hayırsever kahraman" imajı.
+* **Frisk and vehicle search (`E`):** The suspect leans against a wall/car. Outcome odds: 70% surrenders, 20% runs, 10% draws a weapon. **These odds apply only during free patrol**; story scenes have scripted outcomes.
+* **Foot chase and surrender:** A suspect who realizes he can't escape raises his hands and kneels. `E` cuffs him and puts him in the car; turning him in at the office pays the bonus.
+* **Use of force policy:** Shooting an unarmed fleeing suspect is forbidden. Penalty in Section 3.3.
+* **Rich district complaint risk (Rodeo / Vinewood / Mulholland):** Searching a civilian who turns out clean has a 10–15% chance of a complaint.
+* **Later stage (Corrupt Path):** Bribing Internal Affairs, judicial connections, laundering money through a video rental store (VHS), "philanthropic hero" image via donations to All Saints and the church.
 
 ---
 
-## 4. MEKÂNLAR (orijinal SA haritası)
+## 4. LOCATIONS (original SA map)
 
-| Mekân | Bölge | Oyundaki durum | Not |
+Coordinates are recorded in [`LOCATIONS.md`](LOCATIONS.md).
+
+| Location | District | In-game status | Note |
 |---|---|---|---|
-| Cross ailesinin evi | **Jefferson** | Hazır ev iç mekânlarından biri kullanılacak | v1'de Commerce'teydi; Commerce iş bölgesi. Kesin bina Faz 1'de seçilecek. |
-| LSPD/DEA bürosu | Pershing Square | LSPD iç mekânı mevcut | |
-| Idlewood benzinlik arkası | Idlewood | Mevcut, Ballas bölgesi | |
-| All Saints General Hospital | Market | **İç mekânı yok** | Doktor sahnesi dış çekim + başka bir iç mekân ile çözülecek `[AÇIK]` |
-| Jefferson Motel | Jefferson | İç mekân mevcut (Faz 1'de doğrulanacak) | v1'deki "Garcia Motel" yerine. Garcia San Fierro'da. |
-| Ocean Docks 4. Ambar | Ocean Docks | Dış alan mevcut | Konteyner içi için birkaç obje eklenecek |
+| Cross family house | **Jefferson** | Front door recorded | v1 had Commerce; Commerce is a business district. |
+| LSPD/DEA office | Pershing Square | Interior 6, recorded | |
+| Behind the Idlewood gas station | Idlewood | Recorded, Ballas turf | |
+| All Saints General Hospital | Market | **No interior** | Doctor scene: exterior shot + another interior `[OPEN]` |
+| Jefferson Motel | Jefferson | Interior 15, recorded | Replaces v1's "Garcia Motel". Garcia is in San Fierro. |
+| Ocean Docks, Warehouse 4 | Ocean Docks | Container yard recorded | A few objects will be added for the container interior |
 
 ---
 
-## 5. HİKÂYE VE DİYALOGLAR
+## 5. STORY AND DIALOGUE
 
-### Bölüm ve görev yapısı
+### Chapter and mission structure
 
-| Bölüm / Görev | Ad | Gün | İçerik |
+| Chapter / Mission | Title | Day | Content |
 |---|---|---|---|
-| Bölüm 1 / Görev 1 | Rutin Devriye ve Bakiye Şoku | Çarşamba sabah–öğle | Ev, büro, Idlewood devriyesi, hastane, $495 şoku |
-| Bölüm 1 / Görev 2 | Sınırların Zorlanması | Çarşamba öğleden sonra | Slick, Jefferson Motel baskını, $100 ahlak testi, $575, sevkiyat istihbaratı |
-| Ara oynanış | Serbest Devriye Günü | Perşembe gündüz | Oyuncu serbestçe devriye atar, yasal yolun yetmediğini kendisi görür |
-| Bölüm 2 / Görev 3 | Kırılma Noktası | Perşembe gece | Ocean Docks baskını, Kartel Teğmeni, rüşvet çantası, `[Y]` / `[N]` kararı |
+| Chapter 1 / Mission 1 | Routine Patrol and Balance Shock | Wednesday morning–noon | House, office, Idlewood patrol, hospital, $495 shock |
+| Chapter 1 / Mission 2 | Pushing the Limits | Wednesday afternoon | Slick, Jefferson Motel raid, $100 morality test, $575, shipment intel |
+| Interlude | Free Patrol Day | Thursday daytime | The player patrols freely and sees for himself that the legal path won't be enough |
+| Chapter 2 / Mission 3 | Breaking Point | Thursday night | Ocean Docks raid, Cartel Lieutenant, bribe bag, `[Y]` / `[N]` decision |
 
 ---
 
-### BÖLÜM 1 / GÖREV 1: RUTİN DEVRİYE VE BAKİYE ŞOKU
+### CHAPTER 1 / MISSION 1: ROUTINE PATROL AND BALANCE SHOCK
 
-#### SAHNE 1: Jefferson — Cross ailesinin evi (Çarşamba 07:30)
-**Mekân:** Mutfak ve salon. Masada birikmiş faturalar, All Saints Hastanesi'nin kırmızı ihtarnameleri.
-**Karakterler:** Ray, Danny, Sarah.
+#### SCENE 1: Jefferson — The Cross house (Wednesday 07:30)
+**Setting:** Kitchen and living room. Piled-up bills on the table, red final notices from All Saints Hospital.
+**Characters:** Ray, Danny, Sarah.
 
-*(Ray yatak odasından çıkıp mutfağa geçer. Danny masada gevreğini yemektedir.)*
+*(Ray comes out of the bedroom into the kitchen. Danny is eating cereal at the table.)*
 
-* **Danny:** *"Günaydın baba! Bugün yine kötü adamları mı kovalayacaksın?"*
-* **Ray:** *(Oğlunun saçını okşar, hafifçe gülümser)* *"İşimiz bu evlat. Şehri senin için güvenli tutmamız lazım. Okul projen ne durumda?"*
-* **Danny:** *"Öğretmenime babamın DEA ajanı olduğunu söyledim. Herkes rozetini görmek istedi! Bir gün beni devriye arabana bindirecek misin?"*
-* **Ray:** *"Söz veriyorum, annen iyileşsin, seni tura çıkaracağım."*
+* **Danny:** *"Morning, Dad! Are you chasing bad guys again today?"*
+* **Ray:** *(Ruffles his son's hair, smiles faintly)* *"That's the job, kiddo. Gotta keep the city safe for you. How's your school project going?"*
+* **Danny:** *"I told my teacher my dad's a DEA agent. Everybody wants to see your badge! Will you take me for a ride in your patrol car someday?"*
+* **Ray:** *"I promise. As soon as your mom gets better, I'll give you the full tour."*
 
-*(Salondan şiddetli bir öksürük krizi duyulur. Ray hemen salona geçer. Sarah kanepede oturmuş, mendile öksürmektedir.)*
+*(A violent coughing fit comes from the living room. Ray rushes in. Sarah sits on the couch, coughing into a handkerchief.)*
 
-* **Ray:** *(Yanına diz çöker, bardağa su doldurur)* *"Sarah! İlaçlarını aldın mı? Nefes al, sakin ol..."*
-* **Sarah:** *(Bardağı alır, nefesini toplamaya çalışır)* *"İyiyim Ray... Aldım... Sadece ciğerlerim yine sıkıştı. Masadaki mektubu gördün mü?"*
-* **Ray:** *(Mutfak masasındaki All Saints General Hospital amblemli zarfı alır)*
-* **Sarah:** *"Doktor Evans dün akşam yine aradı. Kitle kemoterapiye hemen başlamazsa yayılacakmış. Sigorta 'deneysel tedavi' deyip ödemiyor. Ön ödeme için $12,500 istiyorlar. Cuma sabah ona kadar yatırmazsak sıramızı başkasına vereceklermiş..."*
-* **Ray:** *(Mektubu sıkar, sesini sakin tutmaya çalışır)* *"Merak etme Sarah. Ben bu devletin kanun adamıyım. Rozetime ve işime sadık kaldığım sürece bir yolunu bulacağız. Bürodan avans isteyeceğim, fazla mesai yazdıracağım. O para yatacak."*
-* **Sarah:** *(Ray'in elini tutar)* *"Geçen haftaki ilaçlara maaşının yarısı gitti Ray... Kendini tehlikeye atma, ne olursun."*
-* **Ray:** *(Rozetini beline, Glock-17'sini kılıfına takar)* *"Her şey düzelecek. Sen dinlen, Danny'yi okula ben bırakırım."*
-
----
-
-#### SAHNE 2: Pershing Square — LSPD/DEA Ortak Görev Gücü bürosu (08:45)
-**Mekân:** Amir Garcia'nın ofisi ve büro içi.
-**Karakterler:** Ray, Amir Garcia, Ajan Miller. *(Kısa görünüm: Tenpenny)*
-
-*(Ray büroya girer. Miller elinde kahveyle masaya yaslanmıştır.)*
-
-* **Ajan Miller:** *"Günaydın Ray. Yine yüzünden düşen bin parça. Yenge nasıl?"*
-* **Ray:** *"Aynı Miller... Hastane faturaları üstüme geliyor. Amir odasında mı?"*
-* **Ajan Miller:** *"İçeride ama dikkat et. Eyalet görev gücünün fonunu kesmiş, sabah sabah küplere bindi."*
-
-*(Tam o sırada koridordan C.R.A.S.H. rozetli iri bir memur geçer. Tenpenny, Ray'e kısa bir bakış atar ve yürümeye devam eder.)*
-
-* **Ajan Miller:** *(Sesini alçaltır)* *"Tenpenny. C.R.A.S.H.'in adamı. Onunla aynı asansöre bile binme."*
-
-*(Ray kapıyı vurup Amir Garcia'nın odasına girer.)*
-
-* **Amir Garcia:** *"Gel Cross, otur. Şehirdeki crack salgını kontrolden çıkmak üzere. Ballas, Idlewood'u ve Jefferson'ı zehire boğuyor, malı da limandan giren bir kartel sağlıyor. Sokaktan kanıt toplamamız, torbacıları temizlememiz lazım."*
-* **Ray:** *"Amirim, sözünüzü kesiyorum ama acil bir durumum var. Eşim Sarah'ın akciğer kanseri tedavisi için acilen $12,500 gerekiyor. Bürodan acil sağlık fonu ya da maaş avansı talep edebilir miyim?"*
-* **Amir Garcia:** *(Derin bir iç çeker, dosyayı kapatır)* *"Bak Ray... Sen bu bürodaki en dürüst adamsın. Ama eyalet görev gücü fonunu %20 kesti. Bırak avansı, haftalık fazla mesaiyi bile onaylatamıyorum. Yapabileceğim tek şey, dürüstçe getirdiğin her uyuşturucu ve kanıt için yasal prim prosedürünü uygulamak. Paket başına $15–20... Fazlası elimde yok."*
-* **Ray:** *(Sessiz kalır, çaresizce başını sallar)* *"Anladım amirim. Devriyeye çıkıyorum."*
+* **Ray:** *(Kneels beside her, pours a glass of water)* *"Sarah! Did you take your meds? Breathe, take it easy..."*
+* **Sarah:** *(Takes the glass, catching her breath)* *"I'm fine, Ray... I took them... My lungs just seized up again. Did you see the letter on the table?"*
+* **Ray:** *(Picks up the envelope bearing the All Saints General Hospital logo from the kitchen table)*
+* **Sarah:** *"Dr. Evans called again last night. If the mass doesn't start chemo right away, it'll spread. Insurance won't pay — they call it 'experimental.' They want $12,500 up front. If we don't pay by ten on Friday morning, they'll give our slot to someone else..."*
+* **Ray:** *(Crumples the letter, trying to keep his voice steady)* *"Don't worry, Sarah. I'm a lawman of this state. As long as I stay true to my badge and my job, we'll find a way. I'll ask the office for an advance, put in for overtime. That money will be paid."*
+* **Sarah:** *(Takes Ray's hand)* *"Last week's medicine ate half your paycheck, Ray... Please don't put yourself in danger."*
+* **Ray:** *(Clips his badge to his belt, holsters his Glock-17)* *"Everything's gonna be fine. You rest — I'll drop Danny off at school."*
 
 ---
 
-#### SAHNE 3: Idlewood — Devriye ve ilk sokak müdahalesi (10:15)
-**Mekân:** Sivil DEA Premier & Idlewood benzinliğinin arkası.
-**Karakterler:** Ray, Miller, siyah ceketli torbacı.
+#### SCENE 2: Pershing Square — LSPD/DEA Joint Task Force office (08:45)
+**Setting:** Chief Garcia's office and the bullpen.
+**Characters:** Ray, Chief Garcia, Agent Miller. *(Cameo: Tenpenny)*
 
-*(Miller direksiyondadır, Ray yolcu koltuğunda dalgın.)*
+*(Ray walks into the office. Miller is leaning on a desk with a cup of coffee.)*
 
-* **Ajan Miller:** *"Hafta sonu hanımı alıp Las Venturas'a götüreceğim. Küçük bir kumarhane oteli buldum, biraz rulet oynarız diyorduk. Sen ne yapıyorsun?"*
-* **Ray:** *(Cebinden deri kaplı defterini [`B`] çıkarıp borç listesine bakar)* *"Evdeyim Miller... Sarah'la ilgileneceğim."*
+* **Agent Miller:** *"Morning, Ray. You look like hell again. How's Sarah?"*
+* **Ray:** *"Same, Miller... The hospital bills are piling up on me. Is the chief in?"*
+* **Agent Miller:** *"He's in, but watch yourself. The state cut the task force budget — he's been on the warpath since dawn."*
 
-*(Telsiz cızırdar.)*
-* **Telsiz anonsu:** *"Tüm birimler: Idlewood benzinliğinin arkasında uyuşturucu satışı ihbarı. Şüpheli siyah ceketli, mor bandanalı erkek. Yakındaki birimler intikal etsin."*
-* **Ajan Miller:** *"1-DEA-CROSS anonsu aldı, olay yerine geçiyoruz."*
+*(A burly officer with a C.R.A.S.H. badge walks down the hallway. Tenpenny shoots Ray a brief look and keeps walking.)*
 
-*(Araç benzinliğin arkasında durur. Ray iner, torbacıya yaklaşır.)*
+* **Agent Miller:** *(Lowering his voice)* *"Tenpenny. C.R.A.S.H. Don't even get in an elevator with that guy."*
 
-* **Ray:** *"DEA! Duvara yaslan, ellerini görebileceğim yere koy!"*
-* **Şüpheli:** *"Hey hey! Yanlış adamla uğraşıyorsun ahbap, ben sadece bekliyorum!"*
+*(Ray knocks and enters Chief Garcia's office.)*
 
-*(Ray `E`'ye basar, arama animasyonu başlar. **Senaryolu an:** şüpheli Ray'i itip kaçar.)*
-
-* **Şüpheli:** *"Beni asla yakalayamazsın domuz!"* `[AÇIK: v1'deki ırkçı hakaret değiştirildi, bkz. Bölüm 6]`
-* **Ray:** *(Arkasından koşarak)* *"Dur! Kaçma!"*
-* **Ajan Miller:** *(Kestirmeden önünü keser)* *"Yolun sonu geldi evlat!"*
-
-*(Şüpheli çıkmaz sokağa girer, ellerini kaldırıp diz çöker.)*
-
-* **Şüpheli:** *"Tamam tamam! Vurma! Teslim oluyorum!"*
-* **Ray:** *(Kelepçeyi takar)* *"Sessiz kalma hakkın var. Söylediğin her şey aleyhine delil olarak kullanılabilir."*
-* **Çıkan kanıt:** 3 crack tüpü, $45 kayıt dışı nakit *(kanıt poşetine girer)*.
-
-*(Ray'in belindeki pager öter.)*
-* **Pager:** `ALL SAINTS: SARAH CROSS ODEME YOK. SON GUN CUMA 10:00`
-
-> **Oyun notu:** Bu sahnede ateş etmek orantısız güç kuralını tetikler. Şüpheli silahsızdır; v1'deki *"Dur, yoksa ateş edeceğim!"* repliği oyuncuyu yanlış yönlendirdiği için değiştirildi.
+* **Chief Garcia:** *"Come in, Cross, sit down. The crack epidemic in this city is about to spiral out of control. The Ballas are poisoning Idlewood and Jefferson, and a cartel bringing it in through the port is feeding them. We need evidence off the streets and the dealers cleaned up."*
+* **Ray:** *"Chief, I'm sorry to cut in, but I've got an emergency. My wife Sarah needs $12,500 for her lung cancer treatment, urgently. Can I request an emergency medical fund or a salary advance from the office?"*
+* **Chief Garcia:** *(Sighs deeply, closes the file)* *"Look, Ray... You're the most honest man in this office. But the state cut the task force budget by 20%. Forget an advance — I can't even get weekly overtime approved. All I can do is apply the legal bonus procedure for every drug seizure and piece of evidence you bring in clean. $15–20 a package... That's all I've got."*
+* **Ray:** *(Stays silent, nods helplessly)* *"Understood, Chief. I'm heading out on patrol."*
 
 ---
 
-#### SAHNE 4: All Saints General Hospital (13:00)
-**Mekân:** Hastane girişindeki ATM, Dr. Evans'ın ofisi. `[AÇIK: iç mekân çözümü]`
-**Karakterler:** Ray, Dr. Evans.
+#### SCENE 3: Idlewood — Patrol and the first street stop (10:15)
+**Setting:** Unmarked DEA Premier & behind the Idlewood gas station.
+**Characters:** Ray, Miller, dealer in a black jacket.
 
-*(Ray şüpheliyi ve kanıtı büroya teslim etmiş, $45 primi almıştır. Hastane girişindeki ATM'ye kartını sokar.)*
+*(Miller is driving, Ray lost in thought in the passenger seat.)*
 
-* **ATM ekranı:**
+* **Agent Miller:** *"I'm taking the wife to Las Venturas this weekend. Found a little casino hotel — thought we'd play some roulette. What are you up to?"*
+* **Ray:** *(Takes the leather-bound notebook [`B`] out of his pocket and looks over the debt list)* *"Staying home, Miller... I'll be looking after Sarah."*
+
+*(The radio crackles.)*
+* **Dispatch:** *"All units: report of drug sales behind the Idlewood gas station. Suspect is a male, black jacket, purple bandana. Nearby units respond."*
+* **Agent Miller:** *"1-DEA-CROSS copies, en route."*
+
+*(The car stops behind the gas station. Ray gets out and approaches the dealer.)*
+
+* **Ray:** *"DEA! Against the wall, hands where I can see them!"*
+* **Suspect:** *"Whoa whoa! You got the wrong guy, man, I'm just waitin' here!"*
+
+*(Ray presses `E`, the frisk animation starts. **Scripted moment:** the suspect shoves Ray and runs.)*
+
+* **Suspect:** *"You'll never catch me, pig!"* `[OPEN: v1's racial slur was replaced, see Section 6]`
+* **Ray:** *(Running after him)* *"Stop! Don't run!"*
+* **Agent Miller:** *(Cuts him off through a shortcut)* *"End of the line, kid!"*
+
+*(The suspect runs into a dead end, raises his hands and kneels.)*
+
+* **Suspect:** *"Okay, okay! Don't shoot! I give up!"*
+* **Ray:** *(Cuffs him)* *"You have the right to remain silent. Anything you say can and will be used against you."*
+* **Evidence found:** 3 crack vials, $45 undeclared cash *(goes into the evidence bag)*.
+
+*(The pager on Ray's belt beeps.)*
+* **Pager:** `ALL SAINTS: SARAH CROSS NO PAYMENT. DEADLINE FRI 10:00`
+
+> **Gameplay note:** Firing in this scene triggers the use of force rule — the suspect is unarmed. v1's *"Stop, or I'll shoot!"* line was changed because it misled the player.
+
+---
+
+#### SCENE 4: All Saints General Hospital (13:00)
+**Setting:** The ATM at the hospital entrance, Dr. Evans's office. `[OPEN: interior solution]`
+**Characters:** Ray, Dr. Evans.
+
+*(Ray has turned in the suspect and the evidence and collected the $45 bonus. He puts his card into the ATM at the hospital entrance.)*
+
+* **ATM screen:**
   ```text
-  KULLANILABILIR BAKIYE : $495.00
-  KRITIK BORC           : -$12,500.00 (ALL SAINTS HOSP.)
-  SON ODEME             : CUMA 10:00
+  AVAILABLE BALANCE : $495.00
+  CRITICAL DEBT     : -$12,500.00 (ALL SAINTS HOSP.)
+  DUE               : FRI 10:00
   ```
 
-*(Ray yumruğunu ATM'ye hafifçe vurur, Dr. Evans'ın odasına geçer.)*
+*(Ray thumps the ATM with his fist and heads to Dr. Evans's office.)*
 
-* **Dr. Evans:** *"Ajan Cross, hoş geldiniz. Sarah'ın son röntgen sonuçları geldi."*
-* **Ray:** *"Durumu nasıl doktor?"*
-* **Dr. Evans:** *(Filmi ışığa tutar)* *"Açık konuşacağım Ray. Tümör sol akciğerde büyümeye devam ediyor. Cuma sabahına kadar protokole başlamazsak birkaç ay içinde organ yetmezliği başlar. $12,500'ı getirebildiniz mi?"*
-* **Ray:** *"Biraz daha zaman verin Doktor... Sadece birkaç gün. Maaşımdan kesilmek üzere senet imzalayayım!"*
-* **Dr. Evans:** *"Keşke elimden bir şey gelse Ray... Ama bu protokol ilaç firmasının programı; kontenjan sınırlı ve teminat yatmadığı an sıradaki hastayı almak zorundayım. Cuma sabah on, son gün."*
-
----
-
-### BÖLÜM 1 / GÖREV 2: SINIRLARIN ZORLANMASI (JEFFERSON MOTEL BASKINI)
-
-#### SAHNE 1: Idlewood ara sokak — Muhbir Slick (14:30)
-**Karakterler:** Ray, Slick.
-
-*(Ray hastaneden çıkar. Yasal maaşla bu paranın toplanamayacağını anlamıştır ve daha büyük bir iş arar. Slick'le buluşup cebindeki son harçlıktan $20 uzatır. Bakiye -$20.)*
-
-* **Ray:** *"Slick, hemen teslim edebileceğim bir zula lazım. Büyük küçük fark etmez!"*
-* **Slick:** *(Parayı cebine atar, etrafa bakar)* *"Sakin ol Ajan Cross... Jefferson Motel'de, 104 numarada Ballas'ın adamları mal paketliyor. İçeride 2–3 kişi var, hızlı olursan yakalarsın."*
-* **Ray:** *(Defterine [`B`] not alır)* *"Sadece 2–3 torbacı mı?"*
-* **Slick:** *"Evet adamım, sıradan sokak işi."*
+* **Dr. Evans:** *"Agent Cross, come in. Sarah's latest X-rays are back."*
+* **Ray:** *"How is she, Doc?"*
+* **Dr. Evans:** *(Holds the film up to the light)* *"I'll be straight with you, Ray. The tumor in the left lung keeps growing. If we don't start the protocol by Friday morning, organ failure sets in within a few months. Were you able to bring the $12,500?"*
+* **Ray:** *"Give me a little more time, Doctor... Just a few days. I'll sign a note — take it out of my salary!"*
+* **Dr. Evans:** *"I wish I could do something, Ray... But this protocol is the pharmaceutical company's program; slots are limited, and the moment the deposit isn't in, I have to take the next patient. Friday, ten a.m., is the last day."*
 
 ---
 
-#### SAHNE 2: Jefferson Motel — 104 numaralı oda baskını (15:15)
-**Karakterler:** Ray, Miller, Şüpheli 1, Şüpheli 2.
+### CHAPTER 1 / MISSION 2: PUSHING THE LIMITS (JEFFERSON MOTEL RAID)
 
-*(Ray ve Miller silahlarını çekip kapının önüne gelir.)*
+#### SCENE 1: Idlewood back alley — Informant Slick (14:30)
+**Characters:** Ray, Slick.
 
-* **Ray:** *"Üç deyince giriyoruz Miller. Bir... İki... Üç!"*
-* **Mekanik:** Kapı tekmelenir, içeri girilir (Breach & Clear).
-* **Şüpheli 1:** *"Polisler! Vurun şunları!"* *(Ateş açar)*
-* **Ajan Miller:** *"Siper al Ray!"* *(Çatışma; Şüpheli 1 etkisiz hale getirilir)*
-* **Şüpheli 2:** *"Kahretsin!"* *(Arka pencereden atlayıp kaçar)*
-* **Ray:** *"Pencereden kaçtı! Ben peşindeyim Miller, sen odayı emniyete al!"*
+*(Ray leaves the hospital. He knows a legal salary will never raise this money and goes looking for something bigger. He meets Slick and hands over $20 from the last of his cash. Balance -$20.)*
 
-*(Kovalamaca. Şüpheli çıkmaz sokakta ellerini kaldırıp diz çöker. Ray `E` ile kelepçeler, araca bindirir.)*
-
-*(Ray odaya döner. Yatağın altında kanıt listesine girmemiş **$100 kayıt dışı nakit** bulur.)*
-
-* **Mikro ahlak testi:**
-  * `[A] Parayı cebe at` → +$100, Yozlaşma +2
-  * `[B] Kanıt poşetine koy` → Bildirim primi +$15
+* **Ray:** *"Slick, I need a stash I can hit right now. Big or small, doesn't matter!"*
+* **Slick:** *(Pockets the money, glances around)* *"Easy, Agent Cross... Jefferson Motel, room 104 — Ballas boys are bagging product. Two, three guys inside. Move fast and you'll catch 'em."*
+* **Ray:** *(Makes a note in his notebook [`B`])* *"Just two or three dealers?"*
+* **Slick:** *"Yeah, man. Regular street business."*
 
 ---
 
-#### SAHNE 3: Büro — Sistem çöküşü (16:30)
-**Karakterler:** Ray, Miller.
+#### SCENE 2: Jefferson Motel — Raid on room 104 (15:15)
+**Characters:** Ray, Miller, Suspect 1, Suspect 2.
 
-*(Ray kanıtları ve şüpheliyi teslim eder. Baskın primi: $85. Bakiye: [B] seçildiyse **$575**, [A] seçildiyse **$660**.)*
+*(Ray and Miller draw their weapons and take position at the door.)*
 
-* **Pager:** `ALL SAINTS: KALAN 41 SAAT. $12,500 ODENMEDI`
+* **Ray:** *"On three, Miller. One... Two... Three!"*
+* **Mechanic:** The door is kicked in (Breach & Clear).
+* **Suspect 1:** *"Cops! Light 'em up!"* *(Opens fire)*
+* **Agent Miller:** *"Take cover, Ray!"* *(Firefight; Suspect 1 is neutralized)*
+* **Suspect 2:** *"Damn it!"* *(Jumps out of the back window and runs)*
+* **Ray:** *"He went out the window! I got him, Miller — you secure the room!"*
 
-*(Ray masasına oturur, başını ellerinin arasına alır. Defterini açıp yazar.)*
-* **Defter notu:** *"16:30 — İki operasyon yaptık. Elimde sadece `{BAKIYE}` var. Devletin yasal primleriyle $12,500'ı toplamak imkânsız. Sarah ölüyor. Bir yol bulmam gerek..."*
+*(Chase. The suspect raises his hands in a dead end and kneels. Ray cuffs him with `E` and puts him in the car.)*
 
----
+*(Ray returns to the room. Under the bed he finds **$100 in undeclared cash** that never made it onto the evidence list.)*
 
-#### SAHNE 4: Operasyon odası — İstihbarat brifingi (17:00)
-**Karakterler:** Ray, Miller, telsiz operatörü, Amir Garcia.
-
-*(Ana telsiz cızırdar.)*
-
-* **Telsiz operatörü:** *"Tüm birimlerin dikkatine! İstihbarata göre kartelin büyük sevkiyatı yarın gece Ocean Docks 4. Ambar'a yanaşacak. Konteynerlerde tahminen $500,000 nakit ve uyuşturucu var. Ortak operasyon yarın 22:00'de başlayacak."*
-* **Ajan Miller:** *(Heyecanla ayağa kalkar)* *"Ray! Duydun mu? İşte aradığımız fırsat! Yarın gece liman bizim!"*
-* **Ray:** *(Kılıfındaki Glock'u yerine oturtur, kendi kendine mırıldanır)* *"$500,000..."*
-* **Ajan Miller:** *"Bir şey mi dedin Ray?"*
-* **Ray:** *"Yarın gece hazır olalım Miller."*
+* **Micro morality test:**
+  * `[A] Pocket the money` → +$100, Corruption +2
+  * `[B] Put it in the evidence bag` → Reporting bonus +$15
 
 ---
 
-### ARA OYNANIŞ: SERBEST DEVRİYE GÜNÜ (Perşembe 08:00–21:00)
+#### SCENE 3: The office — System failure (16:30)
+**Characters:** Ray, Miller.
 
-**Amaç:** Oyuncuya yasal yolu kendi eliyle denetmek; hikâyenin "sistem yetmiyor" iddiasını anlatmak yerine oynatmak.
+*(Ray turns in the evidence and the suspect. Raid bonus: $85. Balance: **$575** if [B] was chosen, **$660** if [A].)*
 
-* Oyuncu Idlewood, Ganton, Jefferson ve isterse zengin bölgelerde serbestçe devriye atar.
-* Rastgele şüpheliler: üst arama olasılıkları %70 / %20 / %10 (Bölüm 3.4).
-* Zengin bölge şikâyet riski ve orantısız güç kuralı bu gün ilk kez gerçek sonuç doğurur.
-* Beklenen kazanç: $100–250.
-* **18:00 pager:** `ALL SAINTS: KALAN 16 SAAT`
-* **İsteğe bağlı telefon görüşmesi:** Danny arar: *"Baba, annem bugün hiç kalkamadı..."*
-* **21:00:** Oyun, oyuncuyu operasyon için büroya çağırır.
+* **Pager:** `ALL SAINTS: 41 HOURS LEFT. $12,500 UNPAID`
+
+*(Ray sits at his desk, head in his hands. He opens his notebook and writes.)*
+* **Notebook entry:** *"16:30 — Two operations today. All I have is `{BALANCE}`. Raising $12,500 on the state's legal bonuses is impossible. Sarah is dying. I need to find a way..."*
 
 ---
 
-### BÖLÜM 2 / GÖREV 3: KIRILMA NOKTASI (OCEAN DOCKS)
+#### SCENE 4: Operations room — Intelligence briefing (17:00)
+**Characters:** Ray, Miller, radio operator, Chief Garcia.
 
-#### SAHNE 1: Ocean Docks'a varış (Perşembe 22:45)
-**Mekân:** Liman girişi, şiddetli yağmur ve şimşekler.
+*(The main radio crackles.)*
 
-*(Araç liman kapısında durur. Silecekler hızla çalışır, gök gürler. Miller ve Ray çelik yeleklerini giyer.)*
-
-* **Ajan Miller:** *"Hava berbat... Ama içerisi kaynıyor Ray. LSPD destek ekipleri arka kapıyı tuttu. İçeride en az 10–12 silahlı adam var deniyor."*
-* **Ray:** *(Glock'un şarjörünü kontrol eder, gözleri tek bir noktaya kilitlenmiştir)* *"Destek beklemiyoruz Miller. İçeri giriyoruz."*
-* **Ajan Miller:** *"Hey hey, yavaş ol dostum! Bu bir uyuşturucu baskını, intihar görevi değil!"*
-* **Ray:** *(Pager'a bakar: `KALAN 11 SAAT`)* *"Benim için intihar görevi Miller. Ya şimdi ya hiç."*
-
----
-
-#### SAHNE 2: Karanlık konteyner — Rüşvet teklifi (23:20)
-**Karakterler:** Ray, Kartel Teğmeni.
-
-*(Ray silahı çekili halde ambarın en arkasındaki karanlık konteynere girer. Köşede yaralı Kartel Teğmeni durmaktadır. Ayağının dibinde deri bir seyahat çantası vardır; arkasındaki paletlerde ise sevkiyatın geri kalanı.)*
-
-* **Ray:** *"Kımıldama! Eller havaya! Bitti!"*
-* **Kartel Teğmeni:** *(Acıyla güler, kan tükürür)* *"Bitti mi? Gerçekten bittiğini mi sanıyorsun Ajan Cross?"*
-* **Ray:** *"İsmimi nereden biliyorsun?"*
-* **Kartel Teğmeni:** *"Seni tanıyoruz Ajan Cross... Jefferson'daki küçük evinde akciğer kanseriyle boğuşan eşin Sarah'ı da, 10 yaşındaki oğlun Danny'yi de..."*
-* **Ray:** *(Silahı tutan elleri titrer)* *"Kapa çeneni! Eşimin adını ağzına alma!"*
-* **Kartel Teğmeni:** *(Çantanın fermuarını açar; içi $100'lık desteler doludur)* *"All Saints ne kadar istiyordu? $12,500 mü? Bu çantada $50,000 var. Arkamdaki $450,000'ı ortağına bırak, ikiniz de kahraman olun. Kimse eksik elli bini saymaz."*
-* **Ray:** *"Anonsta beş yüz bin dendi."*
-* **Kartel Teğmeni:** *"O anonsu yapanların yarısı bizim maaş bordromuzda Ajan Cross. Beni kelepçelersen sana verecekleri $150'lık dürüst polis ikramiyesiyle Cuma günü eşinin tabutunu alırsın. Seçim senin..."*
+* **Radio operator:** *"Attention all units! Intelligence says the cartel's big shipment docks at Ocean Docks, Warehouse 4, tomorrow night. The containers are estimated to hold $500,000 in cash and narcotics. The joint operation starts tomorrow at 22:00."*
+* **Agent Miller:** *(Jumps to his feet)* *"Ray! You hear that? That's the break we've been waiting for! Tomorrow night the port is ours!"*
+* **Ray:** *(Settles the Glock in its holster, mutters to himself)* *"$500,000..."*
+* **Agent Miller:** *"You say something, Ray?"*
+* **Ray:** *"Let's be ready tomorrow night, Miller."*
 
 ---
 
-### KIRILMA NOKTASI: KADER EKRANI
+### INTERLUDE: FREE PATROL DAY (Thursday 08:00–21:00)
 
-> Oyun içi metin: ekranda Türkçe karakter kullanılıp kullanılmayacağı `[AÇIK]`. Aşağıdaki metin, karaktersiz (güvenli) sürümdür.
+**Goal:** Let the player test the legal path with his own hands — play the story's "the system isn't enough" claim instead of telling it.
+
+* The player patrols Idlewood, Ganton, Jefferson and, if he wants, the rich districts.
+* Random suspects: frisk odds 70% / 20% / 10% (Section 3.4).
+* The rich district complaint risk and the use of force rule have real consequences for the first time.
+* Expected earnings: $100–250.
+* **18:00 pager:** `ALL SAINTS: 16 HOURS LEFT`
+* **Optional phone call:** Danny calls: *"Dad, Mom couldn't get out of bed at all today..."*
+* **21:00:** The game calls the player back to the office for the operation.
+
+---
+
+### CHAPTER 2 / MISSION 3: BREAKING POINT (OCEAN DOCKS)
+
+#### SCENE 1: Arriving at Ocean Docks (Thursday 22:45)
+**Setting:** Port entrance, heavy rain and lightning.
+
+*(The car stops at the port gate. Wipers going hard, thunder rolling. Miller and Ray put on their vests.)*
+
+* **Agent Miller:** *"Weather's a mess... but it's boiling in there, Ray. LSPD backup has the back gate. Word is there are at least 10–12 armed men inside."*
+* **Ray:** *(Checks the Glock's magazine, eyes locked on a single point)* *"We're not waiting for backup, Miller. We're going in."*
+* **Agent Miller:** *"Whoa, whoa, slow down, buddy! This is a drug raid, not a suicide mission!"*
+* **Ray:** *(Looks at his pager: `11 HOURS LEFT`)* *"For me it is a suicide mission, Miller. Now or never."*
+
+---
+
+#### SCENE 2: The dark container — The bribe (23:20)
+**Characters:** Ray, Cartel Lieutenant.
+
+*(Gun drawn, Ray enters the dark steel container at the very back of the warehouse. The wounded Cartel Lieutenant stands in the corner. At his feet is a leather travel bag; behind him, pallets holding the rest of the shipment.)*
+
+* **Ray:** *"Don't move! Hands up! It's over!"*
+* **Cartel Lieutenant:** *(Laughs through the pain, spits blood)* *"Over? You really think it's over, Agent Cross?"*
+* **Ray:** *"How do you know my name?"*
+* **Cartel Lieutenant:** *"We know you, Agent Cross... Your wife Sarah, fighting lung cancer in that little house in Jefferson. Your ten-year-old boy, Danny..."*
+* **Ray:** *(His gun hand trembles)* *"Shut your mouth! Don't you say my wife's name!"*
+* **Cartel Lieutenant:** *(Unzips the bag; it's full of stacks of $100 bills)* *"How much did All Saints want? $12,500? There's $50,000 in this bag. Leave the $450,000 behind me for your partner and you're both heroes. Nobody's gonna count a missing fifty grand."*
+* **Ray:** *"The call said five hundred thousand."*
+* **Cartel Lieutenant:** *"Half the people who made that call are on our payroll, Agent Cross. Cuff me, and with the $150 honest-cop bonus they'll give you, you can buy your wife a coffin on Friday. Your call..."*
+
+---
+
+### BREAKING POINT: FATE SCREEN
+
+> In-game text is ASCII upper case (SA's font); a Turkish version is planned as a localization.
 
 ```text
 ===================================================================================
-                        KIRILMA NOKTASI: KADERINI SEC
+                        BREAKING POINT: CHOOSE YOUR FATE
 ===================================================================================
 
- [Y] YOZLASMIS YOL (KARA PARA VE HAYAT)
+ [Y] CORRUPT PATH (DIRTY MONEY AND LIFE)
  ----------------------------------------------------------------------------------
-  - $50,000'lik cantayi al. Tegmenin kacmasina goz yum.
-  - Sarah'in $12,500'lik kemoterapi on odemesini yap, hayatini kurtar.
-  - Miller'a ve buroya yalan soyle.
-  - SONUC: Yozlasma en az 50'ye cikar. Kayip $50,000 Ic Isleri'nin
-    dikkatini ceker; seni "koruyan" Tenpenny olur ve onun piyonu olursun.
-    Para aklama (VHS dukkani) mekanikleri acilir.
+  - Take the $50,000 bag. Let the lieutenant slip away.
+  - Pay Sarah's $12,500 chemotherapy down payment and save her life.
+  - Lie to Miller and to the office.
+  - OUTCOME: Corruption rises to at least 50. The missing $50,000 draws
+    Internal Affairs' attention; Tenpenny becomes your "protector" and
+    you become his pawn. Money laundering (VHS store) mechanics unlock.
 
- [N] TEMIZ YOL - ZOR MOD (ONUR VE INTIKAM)
+ [N] CLEAN PATH - HARD MODE (HONOR AND REVENGE)
  ----------------------------------------------------------------------------------
-  - Rusveti reddet. Tegmeni kelepcele ya da vur.
-  - $500,000'in tamamini buroya teslim et (yasal prim: $150).
-  - Cuma 10:00'da odeme yapilamaz. [ACIK: Sarah'in kaderi]
-  - SONUC: Durust kalirsin ama ruhen olursun. Polis destegi kesilir.
-    Sogukkanli, intikam odakli bir infazciya donusursun (Zor Mod).
+  - Refuse the bribe. Cuff or shoot the lieutenant.
+  - Turn in all $500,000 to the office (legal bonus: $150).
+  - Friday 10:00 comes with no payment. [OPEN: Sarah's fate]
+  - OUTCOME: You stay honest but die inside. Police backup is cut off.
+    You become a cold, revenge-driven enforcer (Hard Mode).
 ===================================================================================
 ```
 
-**Kararın sistemdeki karşılıkları:**
-* Teğmen yaralı ve silahsızdır; **N yolunda onu vurmak orantısız güç kuralını tetikler** (Yozlaşma +5, İç İşleri). "Temiz" yolun içinde bile küçük bir gri seçim olur.
-* **Y yolunda** raporda $450,000 yazar, anons $500,000 demişti. Bu fark Bölüm 3'ün açılış çatışmasıdır.
-* **N yolunda "polis desteği kesilir" gerekçesi (öneri):** Teğmen bağlantıları sayesinde 48 saat içinde serbest bırakılır; Ray rozetini masaya bırakıp kanun dışı intikama başlar. `[AÇIK]`
+**What the decision does in the systems:**
+* The lieutenant is wounded and unarmed; **shooting him on the N path triggers the use of force rule** (Corruption +5, Internal Affairs). Even the "clean" path contains a small grey choice.
+* **On the Y path** the report says $450,000 while the call said $500,000. That gap is Chapter 3's opening conflict.
+* **Reason "police backup is cut off" on the N path (proposal):** Thanks to his connections the lieutenant walks within 48 hours; Ray leaves his badge on the desk and goes after revenge outside the law. `[OPEN]`
 
 ---
 
-## 6. AÇIK KARARLAR
+## 6. OPEN DECISIONS
 
-| # | Konu | Seçenekler | Öneri |
+| # | Topic | Options | Recommendation |
 |---|---|---|---|
-| 1 | **N yolunda Sarah'ın kaderi** | (a) v1'deki gibi ölür (b) Pahalı alternatif bir kurtuluş yolu var (tefeci, Miller'ın bağış kampanyası...) | Tema kararı, senin |
-| 2 | **Oyun içi Türkçe karakterler** | (a) Türkçe font yaması (b) Karaktersiz Türkçe ("YOZLASMIS") (c) İngilizce metin | Faz 1'de (a) test edilsin, olmazsa (b) |
-| 3 | **Ray'in etnik kökeni** ve Sahne 3'teki hakaret | (a) Belirle ve hakareti hikâyeye bağla (1992 LA, Rodney King dönemi) (b) Nötr bırak, "domuz" kalsın | Senin |
-| 4 | **Hastane iç mekânı** | (a) Dış çekim + telefon görüşmesi (b) Başka bir iç mekânı ofis gibi kullan (c) Özel iç mekân modelle | Başlangıçta (a), sonra (b) |
-| 5 | **Oyuncu karakteri** | (a) CJ'in görünümünü Ray modeliyle değiştir (b) Ray ayrı bir karakter olarak | Faz 0'da araştırılacak |
-| 6 | **CJ'in görevleriyle çakışma** | CLEO ile orijinal hikâyenin görev işaretleri haritada kalır | Faz 0'da araştırılacak; gerekirse ileride `main.scm` yoluna geçilir |
-| 7 | **Kartel Teğmeni'ne isim** | — | İsteğe bağlı |
+| 1 | **Sarah's fate on the N path** | (a) She dies, as in v1 (b) There is an expensive alternative way to save her (loan shark, Miller's fundraiser...) | A theme decision for the author |
+| 2 | **In-game Turkish characters** (for the Turkish localization) | (a) Turkish font patch (b) ASCII-only Turkish ("YOZLASMIS") | Test (a) in Phase 1, fall back to (b) |
+| 3 | **Ray's ethnicity** and the Scene 3 insult | (a) Define it and tie the insult into the story (1992 LA, Rodney King era) (b) Leave it neutral, keep "pig" | Author |
+| 4 | **Hospital interior** | (a) Exterior shot + phone call (b) Reuse another interior as the office (c) Model a custom interior | (a) first, then (b) |
+| 5 | **Player character** | (a) Replace CJ's appearance with a Ray model (b) Ray as a separate character | Research in Phase 0 |
+| 6 | **Conflict with CJ's missions** | With CLEO, the original story's mission markers stay on the map | Research in Phase 0; move to `main.scm` later if needed |
+| 7 | **Name for the Cartel Lieutenant** | — | Optional |
 
 ---
 
-## 7. DEĞİŞİKLİK KAYDI (v1 → v2)
+## 7. CHANGELOG (v1 → v2)
 
-| Alan | v1 | v2 | Neden |
+| Area | v1 | v2 | Why |
 |---|---|---|---|
-| Ev | Commerce | Jefferson | Commerce iş bölgesi; Jefferson motel, hastane ve Idlewood'a yakın |
-| Motel | Garcia Motel | Jefferson Motel | Garcia San Fierro'da; ayrıca Amir Garcia ile isim karışıyordu |
-| Çete | Barksdale (The Wire) | Ballas | SA kanonu, Idlewood zaten Ballas bölgesi |
-| Kartel | San Fierro Karteli | Loco Syndicate'in tedarikçi karteli | Kanonla bağ: Ballas–Loco Syndicate–Tenpenny crack zinciri |
-| Banka | Fleeca (GTA V) | Adsız banka ATM'si | SA'da Fleeca yok |
-| Şüpheli adı | "BMYDRUG" | "siyah ceketli, mor bandanalı erkek" | BMYDRUG model dosyası adı, oyun içi metin değil |
-| Bütçe | Belediye (Miller) / Eyalet Senatosu DEA bütçesi (Garcia) | Eyalet, görev gücü fonunu kesti (ikisi de) | Çelişki vardı; DEA federal, eyalet bütçesini kesemez |
-| Sigorta | Anılmıyordu | Federal sigorta deneysel protokolü reddetti | "DEA ajanının sigortası yok mu?" boşluğu |
-| Son gün | "3 gün" / "Cuma" / 48→36→24 saat (aynı gün içinde) | Tek son gün: **Cuma 10:00**, pager süreleri gerçek saatten hesaplanıyor | 6 saatte 12 saat düşüyordu |
-| Ocean Docks | Aynı akşam 22:45 | **Perşembe** gecesi; araya Serbest Devriye Günü eklendi | Zaman tutarlılığı + yasal yolun yetmediğini oyuncu kendisi görüyor |
-| Bakiye | $575 (hesap $555 çıkıyordu) | Baskın primi $85 + bildirim primi $15 = $575; [A] seçilirse $660, defter değişkenden okuyor | Hesap hatası; seçimin sonucu yok sayılıyordu |
-| Maaş | Haftalık $1,200 "taksitli" | Haftalık net $950, Pazartesi yatar | "Taksitli" belirsizdi; maaşın ipotek+faturayı bile karşılamaması gerilimi artırıyor |
-| Ahlak | Şeref Puanı + Yozlaşma karışık | Tek değişken `YOZLASMA` (0–100), Şeref = 100 − Yozlaşma | İki değişken tutarsızdı |
-| Kader Y sonucu | "Ahlak puanın sıfırlanır" | Yozlaşma en az 50 | Kademeli yozlaşma daha oynanabilir |
-| Rüşvet | $500,000'in tamamı | $50,000 çanta, $450,000 teslim | Kartelin tüm sevkiyatı vermesi inandırıcı değildi; eksik para Bölüm 3'e kanca oluyor |
-| Tenpenny | Sadece kader ekranında | Bölüm 1'de kısa görünüm + Teğmen'in "bordro" iması | Hiç tanıtılmadan çıkıyordu |
-| Kader ekranı | "Ameliyat faturası" | "Kemoterapi ön ödemesi" | Tedavi kemoterapi |
-| Defter tuşu | N | B (geçici) | N, SA'nın "Hayır" tuşu ve kader ekranı da N kullanıyor |
-| Telefon | Arama + SMS | Sadece arama; mesajlar pager'da | 1992'de tüketici SMS'i yoktu |
-| Diyalog | "Sarah annen", "Danny'ye mukayyet ol", "Dur yoksa ateş edeceğim" | "annen", "Danny'yi okula ben bırakırım", "Dur! Kaçma!" | Doğal olmayan / mekanikle çelişen replikler |
-| Yazım | "B Barksdale", "Aklana" | Düzeltildi | — |
+| House | Commerce | Jefferson | Commerce is a business district; Jefferson is close to the motel, hospital and Idlewood |
+| Motel | Garcia Motel | Jefferson Motel | Garcia is in San Fierro; it also clashed with Chief Garcia's name |
+| Gang | Barksdale (The Wire) | Ballas | SA canon; Idlewood is already Ballas turf |
+| Cartel | San Fierro Cartel | Cartel supplying the Loco Syndicate | Canon tie: Ballas–Loco Syndicate–Tenpenny crack chain |
+| Bank | Fleeca (GTA V) | Unbranded bank ATM | Fleeca doesn't exist in SA |
+| Suspect name | "BMYDRUG" | "black jacket, purple bandana" | BMYDRUG is a model file name, not in-game text |
+| Budget | City (Miller) / State Senate DEA budget (Garcia) | The state cut the task force budget (both) | Contradiction; the DEA is federal, a state can't cut its budget |
+| Insurance | Not mentioned | Federal insurance rejected the experimental protocol | Plot hole: "doesn't a DEA agent have insurance?" |
+| Deadline | "3 days" / "Friday" / 48→36→24 h (within one day) | One deadline: **Friday 10:00**, pager times computed from real clock | 12 hours dropped in 6 |
+| Ocean Docks | Same evening 22:45 | **Thursday** night; Free Patrol Day added in between | Timeline consistency + the player sees the legal path fail |
+| Balance | $575 (math gave $555) | Raid bonus $85 + reporting bonus $15 = $575; $660 with [A]; notebook reads the variable | Arithmetic error; the choice was ignored |
+| Salary | Weekly $1,200 "in installments" | Weekly net $950, paid Monday | "Installments" was unclear; salary not even covering mortgage + bills raises tension |
+| Morality | Honor Points + Corruption mixed | Single `CORRUPTION` (0–100), Honor = 100 − Corruption | Two metrics were inconsistent |
+| Fate Y outcome | "Your morality score is reset" | Corruption at least 50 | Gradual corruption plays better |
+| Bribe | The whole $500,000 | $50,000 bag, $450,000 turned in | The cartel handing over the whole shipment wasn't believable; the missing money hooks Chapter 3 |
+| Tenpenny | Only on the fate screen | Cameo in Chapter 1 + the lieutenant's "payroll" hint | Appeared without introduction |
+| Fate screen | "Surgery bill" | "Chemotherapy down payment" | The treatment is chemotherapy |
+| Notebook key | N | B (provisional) | N is SA's "No" key and the fate screen also uses N |
+| Phone | Calls + SMS | Calls only; messages on the pager | No consumer SMS in 1992 |
+| Dialogue | Unnatural lines / lines contradicting mechanics | Rewritten | — |
+| Typos | "B Barksdale", "Aklana" | Fixed | — |
+| Language | Turkish | English primary, Turkish localization | Global codebase |
