@@ -1,0 +1,37 @@
+// Development tool (not shipped): dumps the game's current key bindings to cleo\dea_controls.txt
+// Runs once, shortly after the game loads. Layout (gta_sa.exe 1.0 US, from plugin-sdk):
+//   ControlsManager = 0xB70198, m_actions[59] at +0xB70, 0x20 bytes per action,
+//   keys[0] = keyboard 1, keys[1] = keyboard 2, keys[2] = mouse, 8 bytes each (keyCode, priority).
+// Key codes are RsKeyCodes: printable keys = ASCII, 1000+ = special keys (1043 = TAB, 1001 = F1...).
+{$CLEO .cs}
+
+script_name {name} 'devctrl'
+
+const
+    ACTIONS_ADDRESS = 0xB70D08
+    ACTION_COUNT = 59
+    ACTION_SIZE = 32
+end
+
+int actionIndex, actionAddress, keyAddress, keyboardKey1, keyboardKey2, mouseKey, dumpHandle
+
+wait {time} 5000
+
+if
+    dumpHandle = open_file {filePathName} "cleo:\dea_controls.txt" {mode} "wt"
+then
+    for actionIndex = 0 to 58
+        actionAddress = actionIndex * ACTION_SIZE
+        actionAddress += ACTIONS_ADDRESS
+        keyboardKey1 = read_memory {address} actionAddress {size} 4 {vp} false
+        keyAddress = actionAddress + 8
+        keyboardKey2 = read_memory {address} keyAddress {size} 4 {vp} false
+        keyAddress = actionAddress + 16
+        mouseKey = read_memory {address} keyAddress {size} 4 {vp} false
+        write_formatted_string_to_file {self} dumpHandle {format} "%d %d %d %d%c%c" actionIndex keyboardKey1 keyboardKey2 mouseKey 13 10
+    end
+    close_file {self} dumpHandle
+    print_string_now {text} "~g~CONTROLS DUMPED" {time} 3000
+end
+
+terminate_this_custom_script
