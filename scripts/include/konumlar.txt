@@ -14,9 +14,11 @@ const
     BURO_IC_Y = 63.90
     BURO_IC_Z = 1003.64
     BURO_IC = 6
-    // dis kapi henuz kaydedilmedi, yaklasik
-    BURO_DIS_X = 1541.0
-    BURO_DIS_Y = -1675.0
+    // dis kapi onu
+    BURO_DIS_X = 1553.53
+    BURO_DIS_Y = -1674.94
+    BURO_DIS_Z = 16.20
+    BURO_DIS_YON = 267.9
 
     // 3 - Idlewood benzinliginin arkasi
     BENZINLIK_X = 1904.32
@@ -35,9 +37,11 @@ const
     MOTEL_IC_Y = -1170.66
     MOTEL_IC_Z = 1029.80
     MOTEL_IC = 15
-    // dis kapi henuz kaydedilmedi, yaklasik
-    MOTEL_DIS_X = 2229.0
-    MOTEL_DIS_Y = -1160.0
+    // dis kapi onu
+    MOTEL_DIS_X = 2231.42
+    MOTEL_DIS_Y = -1159.67
+    MOTEL_DIS_Z = 25.83
+    MOTEL_DIS_YON = 269.4
 
     // 6 - Ocean Docks, konteyner alani
     LIMAN_X = 2781.21
