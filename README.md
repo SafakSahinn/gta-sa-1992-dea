@@ -23,3 +23,4 @@ Bu komut her scripti derleyip `.cs` dosyasını oyunun `cleo` klasörüne kopyal
 | Script | Ne yapar |
 |---|---|
 | `dea_merhaba` | F7'ye basınca ekranda "RAY CROSS - DEA" yazar (kurulum testi) |
+| `dea_konum` | Geliştirme aracı. F8 koordinat göstergesini açar/kapatır, F9 konumu `cleo\dea_konumlar.txt` dosyasına ekler |

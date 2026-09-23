@@ -1,0 +1,72 @@
+// Faz 1 - konum toplama yardimcisi (gelistirme araci, son surumde olmayacak)
+// F8: ekranda surekli koordinat gostergesini ac / kapat
+// F9: o anki konumu cleo\dea_konumlar.txt dosyasina ekle
+{$CLEO .cs}
+
+script_name {name} 'deakonm'
+
+int hud = 0
+int kayit = 0
+float x, y, z, yon
+int ic, saat, dakika
+string bolge
+
+wait {time} 3000
+
+while true
+    wait {time} 0
+
+    if
+        not is_player_playing $player1
+    then
+        continue
+    end
+
+    // F8: gostergeyi ac/kapat
+    if
+        is_key_pressed {keyCode} 0x77
+    then
+        if
+            hud == 0
+        then
+            hud = 1
+        else
+            hud = 0
+            clear_prints
+        end
+        while is_key_pressed {keyCode} 0x77
+            wait {time} 0
+        end
+    end
+
+    x, y, z = get_char_coordinates $scplayer
+    yon = get_char_heading $scplayer
+    ic = get_area_visible
+    bolge = get_name_of_info_zone {pos} x y z
+
+    if
+        hud == 1
+    then
+        print_formatted_now {format} "X %.2f  Y %.2f  Z %.2f~n~YON %.1f  IC %d  %s" {time} 100 x y z yon ic bolge
+    end
+
+    // F9: konumu dosyaya yaz
+    if
+        is_key_pressed {keyCode} 0x78
+    then
+        saat, dakika = get_time_of_day
+        if
+            int f = open_file {filePathName} "cleo:\dea_konumlar.txt" {mode} FileMode.AppendText
+        then
+            kayit += 1
+            write_formatted_string_to_file {self} f {format} "#%d  %.2f %.2f %.2f  yon %.1f  ic %d  %s  saat %02d:%02d%c%c" kayit x y z yon ic bolge saat dakika 13 10
+            close_file {self} f
+            print_formatted_now {format} "~g~KONUM KAYDEDILDI #%d~s~ (%s)" {time} 2000 kayit bolge
+        else
+            print_string_now {text} "~r~DOSYA ACILAMADI" {time} 2000
+        end
+        while is_key_pressed {keyCode} 0x78
+            wait {time} 0
+        end
+    end
+end

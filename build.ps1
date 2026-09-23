@@ -14,7 +14,14 @@ foreach ($src in Get-ChildItem (Join-Path $root 'scripts') -Filter *.txt) {
     $cs = Join-Path $out ($src.BaseName + '.cs')
     if (Test-Path $cs) { Remove-Item $cs }
 
-    $p = Start-Process $sanny -ArgumentList '--no-splash', '--mode', 'sa_sbl', '--compile', "`"$($src.FullName)`"", "`"$cs`"" -Wait -PassThru
+    $p = Start-Process $sanny -ArgumentList '--no-splash', '--mode', 'sa_sbl', '--compile', "`"$($src.FullName)`"", "`"$cs`"" -PassThru
+    # Derleme hatasinda Sanny bir hata penceresi acip bekler; 30 sn icinde bitmezse hata say.
+    if (-not $p.WaitForExit(30000)) {
+        $p.Kill()
+        Write-Host "HATA  $($src.Name) (derleme hatasi penceresi, ayrinti icin dosyayi Sanny Builder'da ac)"
+        $failed++
+        continue
+    }
     if ((Test-Path $cs) -and $p.ExitCode -eq 0) {
         Copy-Item $cs $cleo -Force
         Write-Host "OK    $($src.Name) -> cleo\$($src.BaseName).cs"
