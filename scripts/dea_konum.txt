@@ -1,12 +1,14 @@
 // Faz 1 - konum toplama yardimcisi (gelistirme araci, son surumde olmayacak)
 // F8: ekranda surekli koordinat gostergesini ac / kapat
 // F9: o anki konumu cleo\dea_konumlar.txt dosyasina ekle
+// F10: siradaki proje mekanina isinlan
 {$CLEO .cs}
 
 script_name {name} 'deakonm'
 
 int gosterge = 0
 int kayit = 0
+int hedef = 0
 float x, y, z, yon
 int ic, saat, dakika, dosya
 string bolge
@@ -69,4 +71,72 @@ while true
             wait {time} 0
         end
     end
+
+    // F10: siradaki mekana isinlan (1 -> 6 -> 1)
+    if
+        is_key_pressed {keyCode} 0x79
+    then
+        if
+            is_char_in_any_car $scplayer
+        then
+            print_string_now {text} "~r~ONCE ARACTAN IN" {time} 2000
+        else
+            hedef += 1
+            if
+                hedef > 6
+            then
+                hedef = 1
+            end
+            if
+                hedef == 1
+            then
+                ISINLAN(2185.0, -1290.0)
+                print_string_now {text} "~y~1/6 JEFFERSON~s~ - bir aile evi bul, kapisinda F9" {time} 5000
+            end
+            if
+                hedef == 2
+            then
+                ISINLAN(1541.0, -1675.0)
+                print_string_now {text} "~y~2/6 LSPD BUROSU~s~ - giris kapisinda F9" {time} 5000
+            end
+            if
+                hedef == 3
+            then
+                ISINLAN(1940.0, -1772.0)
+                print_string_now {text} "~y~3/6 IDLEWOOD BENZINLIK~s~ - arka tarafta F9" {time} 5000
+            end
+            if
+                hedef == 4
+            then
+                ISINLAN(1182.0, -1323.0)
+                print_string_now {text} "~y~4/6 ALL SAINTS~s~ - giris kapisinda F9" {time} 5000
+            end
+            if
+                hedef == 5
+            then
+                ISINLAN(2229.0, -1160.0)
+                print_string_now {text} "~y~5/6 JEFFERSON MOTEL~s~ - bir oda kapisinda F9" {time} 5000
+            end
+            if
+                hedef == 6
+            then
+                ISINLAN(2765.0, -2455.0)
+                print_string_now {text} "~y~6/6 OCEAN DOCKS~s~ - konteynerlerin arasinda F9" {time} 5000
+            end
+        end
+        while is_key_pressed {keyCode} 0x79
+            wait {time} 0
+        end
+    end
+end
+
+
+// Oyuncuyu verilen noktaya tasir; z = -100 oyunun zemini kendisinin bulmasini saglar
+function ISINLAN(hx: float, hy: float)
+    set_area_visible {areaId} 0
+    set_char_area_visible $scplayer {areaId} 0
+    load_scene {pos} hx hy 20.0
+    request_collision {pos} hx hy
+    set_char_coordinates $scplayer {pos} hx hy -100.0
+    set_camera_behind_player
 end
