@@ -1,4 +1,4 @@
-// Police mechanics (Phase 3): stop, frisk, surrender, cuff.
+// Police mechanics (Phase 3): stop, frisk, surrender, cuff, escort, book.
 //
 // On foot, next to a pedestrian, press T: the suspect is stopped and the dice decide (GDD 3.4)
 //   70% surrenders, 20% runs, 10% draws a pistol.
@@ -7,10 +7,15 @@
 //   KNEELING  - waits on his knees; press T next to him to cuff him (released after 60 s if you leave him)
 //   FLEEING   - runs; gives up once you stay close to him for 1.5 s
 //   HOSTILE   - shoots at you; drops the gun and gives up when his health falls below 50
-//   CUFFED    - stays on his knees, blue blip (putting him in the car comes next)
+//   CUFFED    - Miranda rights, evidence found on him (0-3 packages), then he stands up
+//   ESCORTED  - follows you on foot; get into a car and he takes a passenger seat
+//   BOARDING  - walking to the car / getting in
+//   IN_CAR    - drive to the LSPD/DEA office (blip) and slow down there to book him:
+//               the legal evidence bonus goes to the story balance
 // The suspect is released when he dies, despawns or gets 60 m away.
 {$CLEO .cs}
 {$INCLUDE include\state.txt}
+{$INCLUDE include\locations.txt}
 
 script_name {name} 'deapolc'
 
@@ -33,6 +38,16 @@ const
     STATE_HOSTILE = 3
     STATE_KNEELING = 4
     STATE_CUFFED = 5
+    STATE_ESCORTED = 6
+    STATE_BOARDING = 7
+    STATE_IN_CAR = 8
+
+    MIRANDA_TIME = 3000         // ms on his knees after cuffing before he stands up
+    BOARD_RANGE = 8.0           // he gets in if you enter a car this close to him
+    BOARD_TIMEOUT = 12000
+    BOOKING_RANGE = 15.0        // around the office door, covers the street in front
+    BOOKING_MAX_SPEED = 3.0
+    MAX_EVIDENCE = 4            // random 0..3 packages
 
     SURRENDER_CHANCE = 70       // roll 0-69
     FLEE_CHANCE_END = 90        // roll 70-89 flee, 90-99 fight
@@ -50,6 +65,8 @@ int suspectHandle = -1
 int suspectState = 0
 int suspectBlip, nearbyCar, nearbyChar, nearbyPedType, diceRoll, forcedOutcome, suspectHealth
 int releaseReason   // 0 = keep, 1 = lost, 2 = down, 3 = got away, 4 = left alone
+int evidenceCount, bonusAmount, balanceNow, officeBlip, hasOfficeBlip, patrolCar, passengerSeat, maxPassengers
+float carSpeed
 
 wait {time} 2000
 
@@ -116,8 +133,10 @@ while true
                         suspectState = STATE_CUFFED
                         change_blip_colour {self} suspectBlip {color} BLIP_BLUE
                         add_one_off_sound {pos} 0.0 0.0 0.0 {soundId} SOUND_CUFFED
-                        print_help_string {text} "~b~Suspect cuffed.~s~ He will wait here on his knees."
+                        evidenceCount = generate_random_int_in_range {min} 0 {max} MAX_EVIDENCE
+                        print_help_formatted {text} "~b~Suspect cuffed.~s~ Found on him: %d crack vial(s). Get him into a car and book him at the office." evidenceCount
                         print_string_now {text} "You have the right to remain silent. Anything you say can and will be used against you." {time} 4000
+                        TimerA = 0
                     else
                         print_string_now {text} "~y~Get closer to cuff him" {time} 1500
                     end
@@ -175,6 +194,152 @@ while true
                     TimerA = 0
                 end
             end
+
+            // --- cuffed: after the Miranda rights he stands up and follows you ---
+            if
+                suspectState == STATE_CUFFED
+            then
+                if
+                    TimerA > MIRANDA_TIME
+                then
+                    clear_char_tasks_immediately {self} suspectHandle
+                    task_follow_footsteps {handle} suspectHandle {target} $scplayer
+                    set_char_keep_task {self} suspectHandle {state} true
+                    suspectState = STATE_ESCORTED
+                end
+            end
+
+            // --- escorted: gets into your car when you get in close to him ---
+            if
+                suspectState == STATE_ESCORTED
+            then
+                if
+                    is_char_sitting_in_any_car {self} $scplayer
+                then
+                    if
+                        locate_char_any_means_char_2d {self} $scplayer {target} suspectHandle {radius} BOARD_RANGE BOARD_RANGE {drawSphere} false
+                    then
+                        patrolCar = store_car_char_is_in_no_save {self} $scplayer
+                        maxPassengers = get_maximum_number_of_passengers {self} patrolCar
+                        if
+                            maxPassengers < 1
+                        then
+                            print_string_now {text} "~y~No room for him in this vehicle" {time} 1000
+                        else
+                            // prefer the back seats
+                            passengerSeat = 0
+                            if
+                                maxPassengers > 1
+                            then
+                                if
+                                    is_car_passenger_seat_free {self} patrolCar {seat} 1
+                                then
+                                    passengerSeat = 1
+                                else
+                                    if
+                                        is_car_passenger_seat_free {self} patrolCar {seat} 2
+                                    then
+                                        passengerSeat = 2
+                                    end
+                                end
+                            end
+                            clear_char_tasks_immediately {self} suspectHandle
+                            task_enter_car_as_passenger {char} suspectHandle {vehicle} patrolCar {time} BOARD_TIMEOUT {seat} passengerSeat
+                            set_char_keep_task {self} suspectHandle {state} true
+                            suspectState = STATE_BOARDING
+                            TimerA = 0
+                        end
+                    end
+                end
+            end
+
+            // --- the car is gone (destroyed or despawned): back to following you ---
+            if
+                suspectState >= STATE_BOARDING
+            then
+                if
+                    not does_vehicle_exist {handle} patrolCar
+                then
+                    if
+                        hasOfficeBlip == 1
+                    then
+                        remove_blip {self} officeBlip
+                        hasOfficeBlip = 0
+                    end
+                    clear_char_tasks_immediately {self} suspectHandle
+                    task_follow_footsteps {handle} suspectHandle {target} $scplayer
+                    suspectState = STATE_ESCORTED
+                end
+            end
+
+            // --- boarding: wait until he is seated; back to following if it fails ---
+            if
+                suspectState == STATE_BOARDING
+            then
+                if
+                    is_char_sitting_in_car {self} suspectHandle {vehicle} patrolCar
+                then
+                    suspectState = STATE_IN_CAR
+                    officeBlip = add_blip_for_coord {pos} OFFICE_EXT_X OFFICE_EXT_Y OFFICE_EXT_Z
+                    hasOfficeBlip = 1
+                    print_help_string {text} "Drive him to the ~b~LSPD/DEA office~s~ and stop in front of it to book him."
+                else
+                    if
+                        not is_char_sitting_in_any_car {self} $scplayer
+                    then
+                        TimerA = BOARD_TIMEOUT
+                    end
+                    if
+                        TimerA >= BOARD_TIMEOUT
+                    then
+                        clear_char_tasks_immediately {self} suspectHandle
+                        task_follow_footsteps {handle} suspectHandle {target} $scplayer
+                        suspectState = STATE_ESCORTED
+                    end
+                end
+            end
+
+            // --- in the car: book him at the office ---
+            if
+                suspectState == STATE_IN_CAR
+            then
+                if
+                    not is_char_sitting_in_car {self} suspectHandle {vehicle} patrolCar
+                then
+                    // he left the car somehow: back to following you
+                    remove_blip {self} officeBlip
+                    hasOfficeBlip = 0
+                    clear_char_tasks_immediately {self} suspectHandle
+                    task_follow_footsteps {handle} suspectHandle {target} $scplayer
+                    suspectState = STATE_ESCORTED
+                else
+                    if
+                        locate_char_in_car_3d {self} $scplayer {pos} OFFICE_EXT_X OFFICE_EXT_Y OFFICE_EXT_Z {radius} BOOKING_RANGE BOOKING_RANGE 8.0 {drawSphere} false
+                    then
+                        carSpeed = get_car_speed {self} patrolCar
+                        if
+                            carSpeed < BOOKING_MAX_SPEED
+                        then
+                            do_fade {time} 500 {direction} 0
+                            wait {time} 600
+                            remove_blip {self} officeBlip
+                            hasOfficeBlip = 0
+                            remove_blip {self} suspectBlip
+                            delete_char {self} suspectHandle
+                            bonusAmount = evidenceCount * EVIDENCE_BONUS
+                            balanceNow = get_cleo_shared_var {index} SV_BALANCE
+                            balanceNow += bonusAmount
+                            set_cleo_shared_var {index} SV_BALANCE {value} balanceNow
+                            suspectState = STATE_NONE
+                            wait {time} 400
+                            do_fade {time} 500 {direction} 1
+                            add_one_off_sound {pos} 0.0 0.0 0.0 {soundId} SOUND_CUFFED
+                            print_help_formatted {text} "~g~Suspect booked.~s~ %d vial(s) logged as evidence. Legal bonus: ~g~$%d~s~" evidenceCount bonusAmount
+                            continue
+                        end
+                    end
+                end
+            end
         end
 
         // --- release ---
@@ -182,6 +347,12 @@ while true
             releaseReason > 0
         then
             remove_blip {self} suspectBlip
+            if
+                hasOfficeBlip == 1
+            then
+                remove_blip {self} officeBlip
+                hasOfficeBlip = 0
+            end
             if
                 releaseReason > 1
             then

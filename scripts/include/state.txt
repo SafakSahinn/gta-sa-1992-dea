@@ -20,6 +20,7 @@ const
     DEADLINE_DAY = 2        // Friday
     DEADLINE_CLOCK = 600    // 10:00
     MINUTES_PER_DAY = 1440
+    EVIDENCE_BONUS = 15     // legal bonus per drug package turned in (GDD: $15-20)
     CORRUPTION_MAX = 100
     TIER_GREY = 25          // 0-24 clean, 25-49 grey, 50-74 dirty, 75-100 baron
     TIER_DIRTY = 50
