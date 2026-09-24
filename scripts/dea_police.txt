@@ -64,13 +64,15 @@ const
     ADDR_SET_CHAR_CREATED_BY = 0x5E47E0
     PED_CREATED_BY_MISSION = 2
     DECISION_MAKER_EMPTY = 65542
+    DECISION_MAKER_RANDOM_NORM = 65538
+    PED_CREATED_BY_OFFSET = 0x484   // CPed::m_nCreatedBy (byte): 1 = ambient, 2 = mission
 end
 
 int suspectHandle = -1
 int suspectState = 0
 int suspectBlip, nearbyCar, nearbyChar, nearbyPedType, diceRoll, forcedOutcome, suspectHealth
 int releaseReason   // 0 = keep, 1 = lost, 2 = down, 3 = got away, 4 = left alone
-int suspectPointer
+int suspectPointer, createdByAddress, nearbyCreatedBy
 int evidenceCount, bonusAmount, balanceNow, officeBlip, hasOfficeBlip, patrolCar, passengerSeat, maxPassengers
 float carSpeed
 
@@ -360,6 +362,15 @@ while true
                 hasOfficeBlip = 0
             end
             if
+                releaseReason > 2
+            then
+                // still alive: hand him back to the ambient AI, otherwise he stays frozen
+                // in his last looping animation with the empty decision maker
+                clear_char_tasks_immediately {self} suspectHandle
+                set_char_keep_task {self} suspectHandle {state} false
+                set_char_decision_maker {self} suspectHandle {handleOrTemplate} DECISION_MAKER_RANDOM_NORM
+            end
+            if
                 releaseReason > 1
             then
                 mark_char_as_no_longer_needed {self} suspectHandle
@@ -407,8 +418,13 @@ while true
                         not is_char_dead {handle} nearbyChar
                     then
                         nearbyPedType = get_ped_type {self} nearbyChar
-                        if
+                        // never take over another script's ped (CJ's story missions)
+                        suspectPointer = get_ped_pointer {char} nearbyChar
+                        createdByAddress = suspectPointer + PED_CREATED_BY_OFFSET
+                        nearbyCreatedBy = read_memory {address} createdByAddress {size} 1 {vp} false
+                        if and
                             nearbyPedType <> PED_TYPE_COP
+                            nearbyCreatedBy <> PED_CREATED_BY_MISSION
                         then
                             suspectHandle = nearbyChar
                             // Take him over from the ambient AI: flag him as a mission ped (CPed::SetCharCreatedBy,
