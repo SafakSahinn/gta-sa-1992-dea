@@ -35,7 +35,7 @@ English is the primary language of the code and the game. Turkish dialogue is pl
 
 ## Building
 
-Scripts live in `scripts/` as [Sanny Builder 4](https://github.com/sannybuilder/dev) sources (`.txt`); shared files in `scripts/include/` are pulled in with `{$INCLUDE}`.
+Scripts live in `scripts/` as [Sanny Builder 4](https://github.com/sannybuilder/dev) sources (`.txt`); shared files in `scripts/include/` are pulled in with `{$INCLUDE}`. One-off tools in `scripts/tools/` are not built automatically (`dev_controls_dump` writes the game's current key bindings to `cleo\dea_controls.txt`).
 
 1. Tell the build where your game and Sanny Builder are — create `build.local.ps1` (not committed):
    ```powershell
@@ -59,5 +59,4 @@ Scripts live in `scripts/` as [Sanny Builder 4](https://github.com/sannybuilder/
 | `dea_state` | Story state manager — applies starting values on a new game, advances the story day at midnight |
 | `dea_police` | Police mechanics (in progress) — T next to a pedestrian: stop and frisk; 70% surrender, 20% flee, 10% draws a pistol |
 | `dev_locator` | Developer tool — F8 position overlay, F9 appends the position to `cleo\dea_locations.txt`, F10 teleports through the project locations |
-| `dev_controls_dump` | Developer tool — writes the game's current key bindings to `cleo\dea_controls.txt` once after loading |
 | `dev_state_hud` | Developer tool — story state overlay; F6 +$100, F11 +1 hour, F12 +5 corruption, F4 reset; 7/8/9 force the next frisk outcome |

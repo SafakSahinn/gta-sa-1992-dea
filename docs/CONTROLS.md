@@ -18,7 +18,7 @@ Developer tools (not shipped): `F7` install check, `F8` position overlay, `F9` s
 
 ## SA default PC bindings
 
-Read from the running game (gta_sa.exe 1.0 US) with `scripts/dev_controls_dump.txt` on 2026-09-23. The table lives at `0xB70D08` (`ControlsManager` `0xB70198` + `m_actions` `0xB70`, 59 actions × 32 bytes; layout from [plugin-sdk](https://github.com/DK22Pac/plugin-sdk)).
+Read from the running game (gta_sa.exe 1.0 US) with `scripts/tools/dev_controls_dump.txt` on 2026-09-23. The table lives at `0xB70D08` (`ControlsManager` `0xB70198` + `m_actions` `0xB70`, 59 actions × 32 bytes; layout from [plugin-sdk](https://github.com/DK22Pac/plugin-sdk)).
 
 | # | Action | Keyboard 1 | Keyboard 2 | Mouse |
 |---|---|---|---|---|

@@ -1,5 +1,6 @@
 // Development tool (not shipped): dumps the game's current key bindings to cleo\dea_controls.txt
-// Runs once, shortly after the game loads. Layout (gta_sa.exe 1.0 US, from plugin-sdk):
+// One-off tool, not built by build.ps1: compile it by hand, copy the .cs into the game's cleo folder,
+// load a game, then delete the .cs again. Runs once, shortly after the game loads. Layout (gta_sa.exe 1.0 US, from plugin-sdk):
 //   ControlsManager = 0xB70198, m_actions[59] at +0xB70, 0x20 bytes per action,
 //   keys[0] = keyboard 1, keys[1] = keyboard 2, keys[2] = mouse, 8 bytes each (keyCode, priority).
 // Key codes are RsKeyCodes: printable keys = ASCII, 1000+ = special keys (1043 = TAB, 1001 = F1...).
