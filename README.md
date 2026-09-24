@@ -2,12 +2,26 @@
 
 A story mod for GTA San Andreas. Los Santos, 1992: DEA agent Raymond Cross needs $12,500 by Friday for his wife's cancer treatment — and the only legal way to earn it pays $15 a package. Somewhere between his badge and his conscience, a cartel lieutenant is waiting with a bag of cash.
 
-> **Status:** early development (Phase 2 of 8). Nothing playable yet beyond developer tools.
+> **Status:** early development — Phases 0–2 done, Phase 3 (police mechanics) next. Nothing playable yet beyond developer tools.
 
 - Design document: [docs/GDD.md](docs/GDD.md) · Turkish: [docs/tr/GDD.md](docs/tr/GDD.md)
 - Recorded locations: [docs/LOCATIONS.md](docs/LOCATIONS.md)
 - Controls and SA default bindings: [docs/CONTROLS.md](docs/CONTROLS.md)
 - Story state (balance, day, deadline, corruption): [docs/STATE.md](docs/STATE.md)
+
+## Roadmap
+
+| Phase | Goal | Status |
+|---|---|---|
+| 0 | Tooling: downgrade to 1.0 US, CLEO 5, Sanny Builder, build script, first script | Done |
+| 1 | Survey: record locations, check key bindings | Done (Turkish font test postponed to localization) |
+| 2 | Story state: balance, story day, deadline countdown, corruption, save/load | Done |
+| 3 | Police mechanics prototype: frisk, surrender/flee/fight, chase, cuff, turn in, use-of-force rule | Next |
+| 4 | UI: pager, field notebook, ATM, brick phone, MDT | Planned |
+| 5 | Mission 1: Routine Patrol and Balance Shock | Planned |
+| 6 | Mission 2 + Free Patrol Day | Planned |
+| 7 | Mission 3 + fate screen | Planned |
+| 8 | Testing and first release (Chapters 1–2) | Planned |
 
 ## Languages
 
