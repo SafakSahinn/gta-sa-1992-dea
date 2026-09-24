@@ -5,7 +5,7 @@
 // Suspect states:
 //   HANDS_UP  - hands raised for a moment, then he kneels
 //   KNEELING  - waits on his knees; press T next to him to cuff him (released after 60 s if you leave him)
-//   FLEEING   - runs; gives up once you stay close to him for 1.5 s
+//   FLEEING   - runs; gives up once you stay within 2.5 m for 3 s, or as soon as you hit him
 //   HOSTILE   - shoots at you; drops the gun and gives up when his health falls below 50
 //   CUFFED    - Miranda rights, evidence found on him (0-3 packages), then he stands up
 //   ESCORTED  - follows you on foot; get into a car and he takes a passenger seat
@@ -23,12 +23,14 @@ const
     KEY_INTERACT = 0x54         // T
     FRISK_RANGE = 3.0
     CUFF_RANGE = 1.8
-    CATCH_RANGE = 3.5
+    CATCH_RANGE = 2.5
     RELEASE_RANGE = 60.0
 
     HANDS_UP_TIME = 2500        // ms with hands up before kneeling
     KNEEL_TIMEOUT = 60000       // ms a kneeling suspect waits to be cuffed
-    CATCH_TIME = 1500           // ms you must stay close to a runner
+    KNEEL_RETRY_TIME = 500      // re-issue the kneel animation this often if something interrupted it
+    CATCH_TIME = 3000           // ms you must stay close to a runner
+    TACKLE_DAMAGE = 5           // a runner who loses this much health (a punch, a tackle) gives up
     GIVE_UP_HEALTH = 50         // an armed suspect gives up below this
 
     // suspect states (outcomes 1-3 match the dev force keys 7/8/9)
@@ -73,6 +75,7 @@ int suspectState = 0
 int suspectBlip, nearbyCar, nearbyChar, nearbyPedType, diceRoll, forcedOutcome, suspectHealth
 int releaseReason   // 0 = keep, 1 = lost, 2 = down, 3 = got away, 4 = left alone
 int suspectPointer, createdByAddress, nearbyCreatedBy
+int fleeStartHealth, healthLost, runnerCaught
 int evidenceCount, bonusAmount, balanceNow, officeBlip, hasOfficeBlip, patrolCar, passengerSeat, maxPassengers
 float carSpeed
 
@@ -163,25 +166,58 @@ while true
                 end
             end
 
-            // --- runner: gives up once you stay close ---
+            // --- kneeling or just cuffed: keep him on his knees ---
+            // A punch, a fall or getting up from the ground can swallow the kneel animation;
+            // check twice a second and play it again if it is not running.
+            if or
+                suspectState == STATE_KNEELING
+                suspectState == STATE_CUFFED
+            then
+                if
+                    TimerB > KNEEL_RETRY_TIME
+                then
+                    TimerB = 0
+                    if
+                        not is_char_playing_anim {self} suspectHandle {animationName} "cower"
+                    then
+                        task_play_anim {handle} suspectHandle {animationName} "cower" {animationFile} "ped" {blendSpeed} 4.0 {loop} true {lockX} false {lockY} false {keepLastFrame} true {time} -1
+                        set_char_keep_task {self} suspectHandle {state} true
+                    end
+                end
+            end
+
+            // --- runner: gives up when you hit him, or when you stay close long enough ---
             if
                 suspectState == STATE_FLEEING
             then
+                runnerCaught = 0
+                suspectHealth = get_char_health {self} suspectHandle
+                healthLost = fleeStartHealth - suspectHealth
+                if
+                    healthLost >= TACKLE_DAMAGE
+                then
+                    runnerCaught = 1
+                end
                 if
                     locate_char_any_means_char_2d {self} $scplayer {target} suspectHandle {radius} CATCH_RANGE CATCH_RANGE {drawSphere} false
                 then
                     if
                         TimerB > CATCH_TIME
                     then
-                        clear_char_tasks_immediately {self} suspectHandle
-                        task_hands_up {handle} suspectHandle {time} HANDS_UP_TIME
-                        change_blip_colour {self} suspectBlip {color} BLIP_GREEN
-                        print_string_now {text} "~g~Okay, okay! Don't shoot! I give up!" {time} 2500
-                        suspectState = STATE_HANDS_UP
-                        TimerA = 0
+                        runnerCaught = 1
                     end
                 else
                     TimerB = 0
+                end
+                if
+                    runnerCaught == 1
+                then
+                    clear_char_tasks_immediately {self} suspectHandle
+                    task_hands_up {handle} suspectHandle {time} HANDS_UP_TIME
+                    change_blip_colour {self} suspectBlip {color} BLIP_GREEN
+                    print_string_now {text} "~g~Okay, okay! Don't hit me! I give up!" {time} 2500
+                    suspectState = STATE_HANDS_UP
+                    TimerA = 0
                 end
             end
 
@@ -478,6 +514,7 @@ while true
                                 task_smart_flee_char {handle} suspectHandle {threat} $scplayer {radius} 200.0 {time} -1
                                 change_blip_colour {self} suspectBlip {color} BLIP_RED
                                 print_string_now {text} "~r~SUSPECT IS RUNNING!" {time} 2500
+                                fleeStartHealth = get_char_health {self} suspectHandle
                                 TimerB = 0
                             end
                             if
