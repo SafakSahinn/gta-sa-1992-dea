@@ -2,11 +2,12 @@
 
 A story mod for GTA San Andreas. Los Santos, 1992: DEA agent Raymond Cross needs $12,500 by Friday for his wife's cancer treatment — and the only legal way to earn it pays $15 a package. Somewhere between his badge and his conscience, a cartel lieutenant is waiting with a bag of cash.
 
-> **Status:** early development (Phase 1 of 8). Nothing playable yet beyond developer tools.
+> **Status:** early development (Phase 2 of 8). Nothing playable yet beyond developer tools.
 
 - Design document: [docs/GDD.md](docs/GDD.md) · Turkish: [docs/tr/GDD.md](docs/tr/GDD.md)
 - Recorded locations: [docs/LOCATIONS.md](docs/LOCATIONS.md)
 - Controls and SA default bindings: [docs/CONTROLS.md](docs/CONTROLS.md)
+- Story state (balance, day, deadline, corruption): [docs/STATE.md](docs/STATE.md)
 
 ## Languages
 
@@ -41,5 +42,7 @@ Scripts live in `scripts/` as [Sanny Builder 4](https://github.com/sannybuilder/
 | Script | Purpose |
 |---|---|
 | `dea_hello` | Installation check — press F7 to show "RAY CROSS - DEA" |
+| `dea_state` | Story state manager — applies starting values on a new game, advances the story day at midnight |
 | `dev_locator` | Developer tool — F8 position overlay, F9 appends the position to `cleo\dea_locations.txt`, F10 teleports through the project locations |
 | `dev_controls_dump` | Developer tool — writes the game's current key bindings to `cleo\dea_controls.txt` once after loading |
+| `dev_state_hud` | Developer tool — story state overlay; F6 +$100, F11 +1 hour, F12 +5 corruption, F4 reset |

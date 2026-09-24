@@ -1,0 +1,151 @@
+// Development tool (not shipped): shows the story state and lets you change it.
+// Always-on overlay under the wanted stars:
+//   BALANCE, CORRUPTION + tier, story day + clock, time left until the hospital deadline.
+// F6  +$100 balance
+// F11 clock +1 hour (crossing midnight advances the story day)
+// F12 +5 corruption
+// F4  reset to the starting state (Wednesday, $450, corruption 0)
+{$CLEO .cs}
+{$INCLUDE include\state.txt}
+
+script_name {name} 'devstat'
+
+int balanceNow, corruptionNow, storyDay, clockHours, clockMinutes, clockNow
+int minutesLeft, hoursLeft, restMinutes
+string dayLabel, tierLabel
+
+wait {time} 2000
+
+while true
+    wait {time} 0
+
+    if
+        not is_player_playing $player1
+    then
+        continue
+    end
+
+    // --- test keys ---
+    if
+        is_key_pressed {keyCode} 0x75 // F6
+    then
+        balanceNow = get_cleo_shared_var {index} SV_BALANCE
+        balanceNow += 100
+        set_cleo_shared_var {index} SV_BALANCE {value} balanceNow
+        while is_key_pressed {keyCode} 0x75
+            wait {time} 0
+        end
+    end
+
+    if
+        is_key_pressed {keyCode} 0x7A // F11
+    then
+        clockHours, clockMinutes = get_time_of_day
+        clockHours += 1
+        if
+            clockHours > 23
+        then
+            clockHours = 0
+        end
+        set_time_of_day {hours} clockHours {minutes} clockMinutes
+        while is_key_pressed {keyCode} 0x7A
+            wait {time} 0
+        end
+    end
+
+    if
+        is_key_pressed {keyCode} 0x7B // F12
+    then
+        corruptionNow = get_cleo_shared_var {index} SV_CORRUPTION
+        corruptionNow += 5
+        if
+            corruptionNow > CORRUPTION_MAX
+        then
+            corruptionNow = CORRUPTION_MAX
+        end
+        set_cleo_shared_var {index} SV_CORRUPTION {value} corruptionNow
+        while is_key_pressed {keyCode} 0x7B
+            wait {time} 0
+        end
+    end
+
+    if
+        is_key_pressed {keyCode} 0x73 // F4
+    then
+        set_time_of_day {hours} 7 {minutes} 30
+        set_cleo_shared_var {index} SV_BALANCE {value} START_BALANCE
+        set_cleo_shared_var {index} SV_CORRUPTION {value} 0
+        set_cleo_shared_var {index} SV_STORY_DAY {value} 0
+        set_cleo_shared_var {index} SV_LAST_CLOCK {value} 450 // 07:30
+        print_string_now {text} "~y~STATE RESET~s~ - Wednesday 07:30, $450" {time} 2000
+        while is_key_pressed {keyCode} 0x73
+            wait {time} 0
+        end
+    end
+
+    // --- read state ---
+    balanceNow = get_cleo_shared_var {index} SV_BALANCE
+    corruptionNow = get_cleo_shared_var {index} SV_CORRUPTION
+    storyDay = get_cleo_shared_var {index} SV_STORY_DAY
+    clockHours, clockMinutes = get_time_of_day
+    clockNow = clockHours * 60
+    clockNow += clockMinutes
+
+    // time left until Friday 10:00
+    minutesLeft = DEADLINE_DAY
+    minutesLeft -= storyDay
+    minutesLeft *= MINUTES_PER_DAY
+    minutesLeft += DEADLINE_CLOCK
+    minutesLeft -= clockNow
+    if
+        minutesLeft < 0
+    then
+        minutesLeft = 0
+    end
+    hoursLeft = minutesLeft / 60
+    restMinutes = hoursLeft * 60
+    restMinutes = minutesLeft - restMinutes
+
+    dayLabel = 'LATE'
+    if
+        storyDay == 0
+    then
+        dayLabel = 'WED'
+    end
+    if
+        storyDay == 1
+    then
+        dayLabel = 'THU'
+    end
+    if
+        storyDay == 2
+    then
+        dayLabel = 'FRI'
+    end
+
+    tierLabel = 'CLEAN'
+    if
+        corruptionNow >= TIER_GREY
+    then
+        tierLabel = 'GREY'
+    end
+    if
+        corruptionNow >= TIER_DIRTY
+    then
+        tierLabel = 'DIRTY'
+    end
+    if
+        corruptionNow >= TIER_BARON
+    then
+        tierLabel = 'BARON'
+    end
+
+    // --- draw (text commands last one frame, so this runs every frame) ---
+    set_text_scale {widthScale} 0.35 {heightScale} 1.4
+    set_text_colour {red} 230 {green} 230 {blue} 230 {alpha} 255
+    set_text_edge {size} 1 {red} 0 {green} 0 {blue} 0 {alpha} 255
+    set_text_proportional {state} true
+    set_text_right_justify {state} true
+    set_text_font {font} 1
+    display_text_formatted {offsetLeft} 630.0 {offsetTop} 140.0 {format} "BALANCE $%d~n~CORRUPTION %d %s~n~%s %02d:%02d~n~DEADLINE %dh %02dm" balanceNow corruptionNow tierLabel dayLabel clockHours clockMinutes hoursLeft restMinutes
+end

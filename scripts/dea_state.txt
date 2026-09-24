@@ -1,0 +1,48 @@
+// Story state manager.
+// - Applies the starting values once per new game (or once on an old save without mod data).
+// - Advances the story day whenever the game clock passes midnight.
+// Other scripts read and change the values directly through the shared variables in include\state.txt.
+{$CLEO .cs}
+{$INCLUDE include\state.txt}
+
+script_name {name} 'deastat'
+
+int isInitialized, storyDay, lastClock, clockNow, clockHours, clockMinutes, clockDrop
+
+wait {time} 1000
+
+isInitialized = get_cleo_shared_var {index} SV_INITIALIZED
+if
+    isInitialized == 0
+then
+    clockHours, clockMinutes = get_time_of_day
+    clockNow = clockHours * 60
+    clockNow += clockMinutes
+    set_cleo_shared_var {index} SV_BALANCE {value} START_BALANCE
+    set_cleo_shared_var {index} SV_CORRUPTION {value} 0
+    set_cleo_shared_var {index} SV_STORY_DAY {value} 0
+    set_cleo_shared_var {index} SV_LAST_CLOCK {value} clockNow
+    set_cleo_shared_var {index} SV_INITIALIZED {value} 1
+end
+
+while true
+    wait {time} 250
+
+    clockHours, clockMinutes = get_time_of_day
+    clockNow = clockHours * 60
+    clockNow += clockMinutes
+    lastClock = get_cleo_shared_var {index} SV_LAST_CLOCK
+
+    // The clock only runs forward on its own, so a big drop means we passed midnight
+    // (also covers sleeping at a safehouse or skipping hours across midnight).
+    clockDrop = lastClock - clockNow
+    if
+        clockDrop > 720
+    then
+        storyDay = get_cleo_shared_var {index} SV_STORY_DAY
+        storyDay += 1
+        set_cleo_shared_var {index} SV_STORY_DAY {value} storyDay
+    end
+
+    set_cleo_shared_var {index} SV_LAST_CLOCK {value} clockNow
+end
