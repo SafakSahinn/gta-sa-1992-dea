@@ -59,12 +59,18 @@ const
     BLIP_GREEN = 1
     BLIP_BLUE = 2
     SOUND_CUFFED = 1058         // frontend "part mission complete" sound
+
+    // gta_sa.exe 1.0 US (plugin-sdk): void __thiscall CPed::SetCharCreatedBy(uchar)
+    ADDR_SET_CHAR_CREATED_BY = 0x5E47E0
+    PED_CREATED_BY_MISSION = 2
+    DECISION_MAKER_EMPTY = 65542
 end
 
 int suspectHandle = -1
 int suspectState = 0
 int suspectBlip, nearbyCar, nearbyChar, nearbyPedType, diceRoll, forcedOutcome, suspectHealth
 int releaseReason   // 0 = keep, 1 = lost, 2 = down, 3 = got away, 4 = left alone
+int suspectPointer
 int evidenceCount, bonusAmount, balanceNow, officeBlip, hasOfficeBlip, patrolCar, passengerSeat, maxPassengers
 float carSpeed
 
@@ -405,6 +411,12 @@ while true
                             nearbyPedType <> PED_TYPE_COP
                         then
                             suspectHandle = nearbyChar
+                            // Take him over from the ambient AI: flag him as a mission ped (CPed::SetCharCreatedBy,
+                            // so he no longer despawns or follows street logic like "leave a stranger's car and run")
+                            // and give him the empty decision maker so he only reacts to our tasks.
+                            suspectPointer = get_ped_pointer {char} suspectHandle
+                            call_method {address} ADDR_SET_CHAR_CREATED_BY {struct} suspectPointer {numArgs} 1 {pop} 0 {args} PED_CREATED_BY_MISSION
+                            set_char_decision_maker {self} suspectHandle {handleOrTemplate} DECISION_MAKER_EMPTY
                             print_string_now {text} "~b~DEA!~s~ Against the wall, hands where I can see them!" {time} 3000
                             clear_char_tasks_immediately {self} suspectHandle
                             task_turn_char_to_face_char {char} suspectHandle {target} $scplayer
