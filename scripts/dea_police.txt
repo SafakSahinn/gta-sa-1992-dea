@@ -1,7 +1,14 @@
-// Police mechanics (Phase 3, part 1): stop and frisk.
+// Police mechanics (Phase 3): stop, frisk, surrender, cuff.
+//
 // On foot, next to a pedestrian, press T: the suspect is stopped and the dice decide (GDD 3.4)
-//   70% surrenders (hands up), 20% runs, 10% draws a pistol.
-// The suspect gets a blip; he is released when he dies, despawns or gets 60 m away.
+//   70% surrenders, 20% runs, 10% draws a pistol.
+// Suspect states:
+//   HANDS_UP  - hands raised for a moment, then he kneels
+//   KNEELING  - waits on his knees; press T next to him to cuff him (released after 60 s if you leave him)
+//   FLEEING   - runs; gives up once you stay close to him for 1.5 s
+//   HOSTILE   - shoots at you; drops the gun and gives up when his health falls below 50
+//   CUFFED    - stays on his knees, blue blip (putting him in the car comes next)
+// The suspect is released when he dies, despawns or gets 60 m away.
 {$CLEO .cs}
 {$INCLUDE include\state.txt}
 
@@ -10,13 +17,22 @@ script_name {name} 'deapolc'
 const
     KEY_INTERACT = 0x54         // T
     FRISK_RANGE = 3.0
+    CUFF_RANGE = 1.8
+    CATCH_RANGE = 3.5
     RELEASE_RANGE = 60.0
-    SURRENDER_TIME = 30000      // ms the suspect keeps his hands up
 
-    OUTCOME_NONE = 0
-    OUTCOME_SURRENDER = 1
-    OUTCOME_FLEE = 2
-    OUTCOME_FIGHT = 3
+    HANDS_UP_TIME = 2500        // ms with hands up before kneeling
+    KNEEL_TIMEOUT = 60000       // ms a kneeling suspect waits to be cuffed
+    CATCH_TIME = 1500           // ms you must stay close to a runner
+    GIVE_UP_HEALTH = 50         // an armed suspect gives up below this
+
+    // suspect states (outcomes 1-3 match the dev force keys 7/8/9)
+    STATE_NONE = 0
+    STATE_HANDS_UP = 1
+    STATE_FLEEING = 2
+    STATE_HOSTILE = 3
+    STATE_KNEELING = 4
+    STATE_CUFFED = 5
 
     SURRENDER_CHANCE = 70       // roll 0-69
     FLEE_CHANCE_END = 90        // roll 70-89 flee, 90-99 fight
@@ -26,11 +42,13 @@ const
     MODEL_PISTOL = 346
     BLIP_RED = 0
     BLIP_GREEN = 1
+    BLIP_BLUE = 2
 end
 
 int suspectHandle = -1
-int suspectStatus = 0
-int suspectBlip, nearbyCar, nearbyChar, nearbyPedType, diceRoll, forcedOutcome
+int suspectState = 0
+int suspectBlip, nearbyCar, nearbyChar, nearbyPedType, diceRoll, forcedOutcome, suspectHealth
+int releaseReason   // 0 = keep, 1 = lost, 2 = down, 3 = got away, 4 = left alone
 
 wait {time} 2000
 
@@ -43,52 +61,155 @@ while true
         continue
     end
 
-    // --- follow the current suspect ---
+    // ================= follow the current suspect =================
     if
-        suspectStatus <> OUTCOME_NONE
+        suspectState <> STATE_NONE
     then
+        releaseReason = 0
         if
             not does_char_exist {handle} suspectHandle
         then
-            RELEASE_SUSPECT(suspectBlip)
-            suspectStatus = OUTCOME_NONE
-            print_string_now {text} "~y~SUSPECT LOST" {time} 2000
-            continue
-        end
-        if
-            is_char_dead {handle} suspectHandle
-        then
-            RELEASE_SUSPECT(suspectBlip)
-            mark_char_as_no_longer_needed {self} suspectHandle
-            suspectStatus = OUTCOME_NONE
-            print_string_now {text} "~r~SUSPECT DOWN" {time} 2000
-            continue
-        end
-        if
-            not locate_char_any_means_char_2d {self} $scplayer {target} suspectHandle {radius} RELEASE_RANGE RELEASE_RANGE {drawSphere} false
-        then
-            RELEASE_SUSPECT(suspectBlip)
-            mark_char_as_no_longer_needed {self} suspectHandle
-            suspectStatus = OUTCOME_NONE
-            print_string_now {text} "~y~SUSPECT GOT AWAY" {time} 2000
-            continue
-        end
-        if
-            suspectStatus == OUTCOME_SURRENDER
-        then
+            releaseReason = 1
+        else
             if
-                TimerA > SURRENDER_TIME
+                is_char_dead {handle} suspectHandle
             then
-                RELEASE_SUSPECT(suspectBlip)
-                mark_char_as_no_longer_needed {self} suspectHandle
-                suspectStatus = OUTCOME_NONE
-                print_string_now {text} "~y~SUSPECT RELEASED" {time} 2000
+                releaseReason = 2
+            else
+                if
+                    not locate_char_any_means_char_2d {self} $scplayer {target} suspectHandle {radius} RELEASE_RANGE RELEASE_RANGE {drawSphere} false
+                then
+                    releaseReason = 3
+                end
             end
+        end
+
+        if
+            releaseReason == 0
+        then
+            // --- hands up -> kneel ---
+            if
+                suspectState == STATE_HANDS_UP
+            then
+                if
+                    TimerA > HANDS_UP_TIME
+                then
+                    clear_char_tasks_immediately {self} suspectHandle
+                    task_play_anim {handle} suspectHandle {animationName} "cower" {animationFile} "ped" {blendSpeed} 4.0 {loop} true {lockX} false {lockY} false {keepLastFrame} true {time} -1
+                    set_char_keep_task {self} suspectHandle {state} true
+                    suspectState = STATE_KNEELING
+                    TimerA = 0
+                end
+            end
+
+            // --- kneeling: T to cuff, or he leaves after a while ---
+            if
+                suspectState == STATE_KNEELING
+            then
+                if
+                    is_key_pressed {keyCode} KEY_INTERACT
+                then
+                    if
+                        locate_char_on_foot_char_2d {self} $scplayer {target} suspectHandle {radius} CUFF_RANGE CUFF_RANGE {drawSphere} false
+                    then
+                        suspectState = STATE_CUFFED
+                        change_blip_colour {self} suspectBlip {color} BLIP_BLUE
+                        print_string_now {text} "You have the right to remain silent. Anything you say can and will be used against you." {time} 4000
+                    else
+                        print_string_now {text} "~y~Get closer to cuff him" {time} 1500
+                    end
+                    while is_key_pressed {keyCode} KEY_INTERACT
+                        wait {time} 0
+                    end
+                end
+                if
+                    suspectState == STATE_KNEELING
+                then
+                    if
+                        TimerA > KNEEL_TIMEOUT
+                    then
+                        releaseReason = 4
+                    end
+                end
+            end
+
+            // --- runner: gives up once you stay close ---
+            if
+                suspectState == STATE_FLEEING
+            then
+                if
+                    locate_char_any_means_char_2d {self} $scplayer {target} suspectHandle {radius} CATCH_RANGE CATCH_RANGE {drawSphere} false
+                then
+                    if
+                        TimerB > CATCH_TIME
+                    then
+                        clear_char_tasks_immediately {self} suspectHandle
+                        task_hands_up {handle} suspectHandle {time} HANDS_UP_TIME
+                        change_blip_colour {self} suspectBlip {color} BLIP_GREEN
+                        print_string_now {text} "~g~Okay, okay! Don't shoot! I give up!" {time} 2500
+                        suspectState = STATE_HANDS_UP
+                        TimerA = 0
+                    end
+                else
+                    TimerB = 0
+                end
+            end
+
+            // --- armed: gives up when badly hurt ---
+            if
+                suspectState == STATE_HOSTILE
+            then
+                suspectHealth = get_char_health {self} suspectHandle
+                if
+                    suspectHealth < GIVE_UP_HEALTH
+                then
+                    remove_all_char_weapons {self} suspectHandle
+                    clear_char_tasks_immediately {self} suspectHandle
+                    task_hands_up {handle} suspectHandle {time} HANDS_UP_TIME
+                    change_blip_colour {self} suspectBlip {color} BLIP_GREEN
+                    print_string_now {text} "~g~Don't shoot! I'm done, I'm done!" {time} 2500
+                    suspectState = STATE_HANDS_UP
+                    TimerA = 0
+                end
+            end
+        end
+
+        // --- release ---
+        if
+            releaseReason > 0
+        then
+            remove_blip {self} suspectBlip
+            if
+                releaseReason > 1
+            then
+                mark_char_as_no_longer_needed {self} suspectHandle
+            end
+            if
+                releaseReason == 1
+            then
+                print_string_now {text} "~y~SUSPECT LOST" {time} 2000
+            end
+            if
+                releaseReason == 2
+            then
+                print_string_now {text} "~r~SUSPECT DOWN" {time} 2000
+            end
+            if
+                releaseReason == 3
+            then
+                print_string_now {text} "~y~SUSPECT GOT AWAY" {time} 2000
+            end
+            if
+                releaseReason == 4
+            then
+                print_string_now {text} "~y~SUSPECT WALKED AWAY" {time} 2000
+            end
+            suspectState = STATE_NONE
         end
         continue
     end
 
-    // --- T: stop the closest pedestrian ---
+    // ================= T: stop the closest pedestrian =================
     if
         is_key_pressed {keyCode} KEY_INTERACT
     then
@@ -114,26 +235,26 @@ while true
                             clear_char_tasks_immediately {self} suspectHandle
                             task_turn_char_to_face_char {char} suspectHandle {target} $scplayer
 
-                            // dice (a developer key can force the next outcome, see dev_state_hud)
+                            // dice (dev keys 7/8/9 in dev_state_hud can force the next outcome)
                             forcedOutcome = get_cleo_shared_var {index} SV_DEV_FORCE_OUTCOME
                             if
-                                forcedOutcome > OUTCOME_NONE
+                                forcedOutcome > STATE_NONE
                             then
-                                suspectStatus = forcedOutcome
-                                set_cleo_shared_var {index} SV_DEV_FORCE_OUTCOME {value} OUTCOME_NONE
+                                suspectState = forcedOutcome
+                                set_cleo_shared_var {index} SV_DEV_FORCE_OUTCOME {value} STATE_NONE
                             else
                                 diceRoll = generate_random_int_in_range {min} 0 {max} 100
                                 if
                                     diceRoll < SURRENDER_CHANCE
                                 then
-                                    suspectStatus = OUTCOME_SURRENDER
+                                    suspectState = STATE_HANDS_UP
                                 else
                                     if
                                         diceRoll < FLEE_CHANCE_END
                                     then
-                                        suspectStatus = OUTCOME_FLEE
+                                        suspectState = STATE_FLEEING
                                     else
-                                        suspectStatus = OUTCOME_FIGHT
+                                        suspectState = STATE_HOSTILE
                                     end
                                 end
                             end
@@ -142,22 +263,23 @@ while true
                             set_char_keep_task {self} suspectHandle {state} true
 
                             if
-                                suspectStatus == OUTCOME_SURRENDER
+                                suspectState == STATE_HANDS_UP
                             then
-                                task_hands_up {handle} suspectHandle {time} SURRENDER_TIME
+                                task_hands_up {handle} suspectHandle {time} HANDS_UP_TIME
                                 change_blip_colour {self} suspectBlip {color} BLIP_GREEN
                                 print_string_now {text} "~g~SUSPECT SURRENDERS" {time} 2500
                                 TimerA = 0
                             end
                             if
-                                suspectStatus == OUTCOME_FLEE
+                                suspectState == STATE_FLEEING
                             then
                                 task_smart_flee_char {handle} suspectHandle {threat} $scplayer {radius} 200.0 {time} -1
                                 change_blip_colour {self} suspectBlip {color} BLIP_RED
                                 print_string_now {text} "~r~SUSPECT IS RUNNING!" {time} 2500
+                                TimerB = 0
                             end
                             if
-                                suspectStatus == OUTCOME_FIGHT
+                                suspectState == STATE_HOSTILE
                             then
                                 request_model {modelId} MODEL_PISTOL
                                 load_all_models_now
@@ -178,9 +300,4 @@ while true
             wait {time} 0
         end
     end
-end
-
-
-function RELEASE_SUSPECT(blipToRemove: int)
-    remove_blip {self} blipToRemove
 end

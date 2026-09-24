@@ -16,7 +16,7 @@ A story mod for GTA San Andreas. Los Santos, 1992: DEA agent Raymond Cross needs
 | 0 | Tooling: downgrade to 1.0 US, CLEO 5, Sanny Builder, build script, first script | Done |
 | 1 | Survey: record locations, check key bindings | Done (Turkish font test postponed to localization) |
 | 2 | Story state: balance, story day, deadline countdown, corruption, save/load | Done |
-| 3 | Police mechanics prototype: frisk, surrender/flee/fight, chase, cuff, turn in, use-of-force rule | In progress (frisk + dice done) |
+| 3 | Police mechanics prototype: frisk, surrender/flee/fight, chase, cuff, turn in, use-of-force rule | In progress (frisk, surrender, cuffing done) |
 | 4 | UI: pager, field notebook, ATM, brick phone, MDT | Planned |
 | 5 | Mission 1: Routine Patrol and Balance Shock | Planned |
 | 6 | Mission 2 + Free Patrol Day | Planned |
@@ -57,6 +57,6 @@ Scripts live in `scripts/` as [Sanny Builder 4](https://github.com/sannybuilder/
 |---|---|
 | `dea_hello` | Installation check — press F7 to show "RAY CROSS - DEA" |
 | `dea_state` | Story state manager — applies starting values on a new game, advances the story day at midnight |
-| `dea_police` | Police mechanics (in progress) — T next to a pedestrian: stop and frisk; 70% surrender, 20% flee, 10% draws a pistol |
+| `dea_police` | Police mechanics (in progress) — T next to a pedestrian: stop and frisk (70% surrender, 20% flee, 10% draws a pistol); surrendering suspects kneel, T cuffs them; runners give up when caught, armed suspects when badly hurt |
 | `dev_locator` | Developer tool — F8 position overlay, F9 appends the position to `cleo\dea_locations.txt`, F10 teleports through the project locations |
 | `dev_state_hud` | Developer tool — story state overlay; F6 +$100, F11 +1 hour, F12 +5 corruption, F4 reset; 7/8/9 force the next frisk outcome |
