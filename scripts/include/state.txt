@@ -12,6 +12,7 @@ const
     SV_CORRUPTION = 902     // 0..100, Honor shown to the player = 100 - corruption
     SV_STORY_DAY = 903      // 0 = Wednesday, 1 = Thursday, 2 = Friday, 3+ = after the deadline
     SV_LAST_CLOCK = 904     // game clock (minutes since midnight) seen last, to detect midnight
+    SV_DEV_FORCE_OUTCOME = 905  // dev only: 0 = roll dice, 1/2/3 = force the next frisk outcome
 
     // --- story rules (GDD sections 3.1-3.3) ---
     START_BALANCE = 450

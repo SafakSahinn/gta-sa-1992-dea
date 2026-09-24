@@ -5,6 +5,7 @@
 // F11 clock +1 hour (crossing midnight advances the story day)
 // F12 +5 corruption
 // F4  reset to the starting state (Wednesday, $450, corruption 0)
+// 7 / 8 / 9  force the next frisk outcome: surrender / flee / fight
 {$CLEO .cs}
 {$INCLUDE include\state.txt}
 
@@ -79,6 +80,35 @@ while true
         set_cleo_shared_var {index} SV_LAST_CLOCK {value} 450 // 07:30
         print_string_now {text} "~y~STATE RESET~s~ - Wednesday 07:30, $450" {time} 2000
         while is_key_pressed {keyCode} 0x73
+            wait {time} 0
+        end
+    end
+
+    // 7 / 8 / 9: force the next frisk outcome (surrender / flee / fight)
+    if
+        is_key_pressed {keyCode} 0x37 // 7
+    then
+        set_cleo_shared_var {index} SV_DEV_FORCE_OUTCOME {value} 1
+        print_string_now {text} "~y~NEXT FRISK:~s~ SURRENDER" {time} 2000
+        while is_key_pressed {keyCode} 0x37
+            wait {time} 0
+        end
+    end
+    if
+        is_key_pressed {keyCode} 0x38 // 8
+    then
+        set_cleo_shared_var {index} SV_DEV_FORCE_OUTCOME {value} 2
+        print_string_now {text} "~y~NEXT FRISK:~s~ FLEE" {time} 2000
+        while is_key_pressed {keyCode} 0x38
+            wait {time} 0
+        end
+    end
+    if
+        is_key_pressed {keyCode} 0x39 // 9
+    then
+        set_cleo_shared_var {index} SV_DEV_FORCE_OUTCOME {value} 3
+        print_string_now {text} "~y~NEXT FRISK:~s~ FIGHT" {time} 2000
+        while is_key_pressed {keyCode} 0x39
             wait {time} 0
         end
     end

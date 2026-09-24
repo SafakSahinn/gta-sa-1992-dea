@@ -12,7 +12,7 @@
 
 All of them are unbound in SA's default PC controls. `Y` / `N` are SA's "conversation yes/no" keys, which the game only reads during conversations.
 
-Developer tools (not shipped): `F7` install check, `F8` position overlay, `F9` save position, `F10` teleport through project locations.
+Developer tools (not shipped): `F7` install check, `F8` position overlay, `F9` save position, `F10` teleport through project locations, `F6` / `F11` / `F12` / `F4` story state test keys (see STATE.md), `7` / `8` / `9` force the next frisk outcome.
 
 > Players who remap SA's controls could still collide with these keys. Making mod keys configurable (e.g. through an `.ini` file) is planned.
 
