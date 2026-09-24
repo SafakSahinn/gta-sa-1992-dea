@@ -43,6 +43,7 @@ const
     BLIP_RED = 0
     BLIP_GREEN = 1
     BLIP_BLUE = 2
+    SOUND_CUFFED = 1058         // frontend "part mission complete" sound
 end
 
 int suspectHandle = -1
@@ -114,6 +115,8 @@ while true
                     then
                         suspectState = STATE_CUFFED
                         change_blip_colour {self} suspectBlip {color} BLIP_BLUE
+                        add_one_off_sound {pos} 0.0 0.0 0.0 {soundId} SOUND_CUFFED
+                        print_help_string {text} "~b~Suspect cuffed.~s~ He will wait here on his knees."
                         print_string_now {text} "You have the right to remain silent. Anything you say can and will be used against you." {time} 4000
                     else
                         print_string_now {text} "~y~Get closer to cuff him" {time} 1500
