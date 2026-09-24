@@ -57,6 +57,6 @@ Scripts live in `scripts/` as [Sanny Builder 4](https://github.com/sannybuilder/
 |---|---|
 | `dea_hello` | Installation check — press F7 to show "RAY CROSS - DEA" |
 | `dea_state` | Story state manager — applies starting values on a new game, advances the story day at midnight |
-| `dea_police` | Police mechanics (in progress) — T next to a pedestrian: stop and frisk (70% surrender, 20% flee, 10% draws a pistol); surrendering suspects kneel, T cuffs them; runners give up when caught, armed suspects when badly hurt; a cuffed suspect follows you into your car and is booked at the LSPD/DEA office for the evidence bonus |
+| `dea_police` | Police mechanics (in progress) — T next to a pedestrian: stop and frisk (70% surrender, 20% flee, 10% draws a pistol); surrendering suspects kneel, T cuffs them; runners give up when hit or worn out by a 12 s chase, armed suspects when badly hurt; a cuffed suspect follows you into your car and is booked at the LSPD/DEA office for the evidence bonus |
 | `dev_locator` | Developer tool — F8 position overlay, F9 appends the position to `cleo\dea_locations.txt`, F10 teleports through the project locations |
-| `dev_state_hud` | Developer tool — story state overlay; F6 +$100, F11 +1 hour, F12 +5 corruption, F4 reset; 7/8/9 force the next frisk outcome |
+| `dev_state_hud` | Developer tool — story state overlay; F6 +$100, F11 +1 hour, F12 +5 corruption, F4 reset; 7/8/9 force the next frisk outcome, F3 inspect a ped |

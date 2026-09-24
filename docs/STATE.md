@@ -19,6 +19,8 @@ So any script can read the values, and they follow the player's save slot withou
 | 902 | `SV_CORRUPTION` | 0–100. Honor shown to the player = 100 − corruption |
 | 903 | `SV_STORY_DAY` | 0 = Wednesday, 1 = Thursday, 2 = Friday, 3+ = after the deadline |
 | 904 | `SV_LAST_CLOCK` | Game clock (minutes since midnight) seen last; used to detect midnight |
+| 905 | `SV_DEV_FORCE_OUTCOME` | Dev only: forces the next frisk outcome (1 surrender, 2 flee, 3 fight) |
+| 906 | `SV_ACTIVE_SUSPECT` | Ped handle `dea_police` is currently handling, 0 = none |
 
 ## Rules
 
@@ -38,3 +40,5 @@ Shown under the wanted stars: balance, corruption and tier, story day and clock,
 | F11 | Clock +1 hour (crossing midnight advances the story day) |
 | F12 | +5 corruption |
 | F4 | Reset: Wednesday 07:30, $450, corruption 0 |
+| 7 / 8 / 9 | Force the next frisk outcome: surrender / flee / fight |
+| F3 | Inspect your front passenger (in a car) or the closest ped: created by the game (ambient) or a script (mission), and whether it is our active suspect |

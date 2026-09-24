@@ -5,7 +5,8 @@
 // Suspect states:
 //   HANDS_UP  - hands raised for a moment, then he kneels
 //   KNEELING  - waits on his knees; press T next to him to cuff him (released after 60 s if you leave him)
-//   FLEEING   - runs; gives up once you stay within 2.5 m for 3 s, or as soon as you hit him
+//   FLEEING   - runs; gives up after 12 s of being chased within 15 m (falling behind pauses the count),
+//               or as soon as you hit him
 //   HOSTILE   - shoots at you; drops the gun and gives up when his health falls below 50
 //   CUFFED    - Miranda rights, evidence found on him (0-3 packages), then he stands up
 //   ESCORTED  - follows you on foot; get into a car and he takes a passenger seat
@@ -23,13 +24,13 @@ const
     KEY_INTERACT = 0x54         // T
     FRISK_RANGE = 3.0
     CUFF_RANGE = 1.8
-    CATCH_RANGE = 2.5
+    CHASE_RANGE = 15.0          // chase time counts while you are this close to a runner
     RELEASE_RANGE = 60.0
 
     HANDS_UP_TIME = 2500        // ms with hands up before kneeling
     KNEEL_TIMEOUT = 60000       // ms a kneeling suspect waits to be cuffed
     KNEEL_RETRY_TIME = 500      // re-issue the kneel animation this often if something interrupted it
-    CATCH_TIME = 3000           // ms you must stay close to a runner
+    EXHAUSTION_TIME = 12000     // ms of chasing within CHASE_RANGE until a runner is worn out
     TACKLE_DAMAGE = 5           // a runner who loses this much health (a punch, a tackle) gives up
     GIVE_UP_HEALTH = 50         // an armed suspect gives up below this
 
@@ -75,7 +76,7 @@ int suspectState = 0
 int suspectBlip, nearbyCar, nearbyChar, nearbyPedType, diceRoll, forcedOutcome, suspectHealth
 int releaseReason   // 0 = keep, 1 = lost, 2 = down, 3 = got away, 4 = left alone
 int suspectPointer, createdByAddress, nearbyCreatedBy
-int fleeStartHealth, healthLost, runnerCaught
+int fleeStartHealth, healthLost, runnerCaught, chaseTime, lastGameTime, gameTimeNow, frameTime
 int evidenceCount, bonusAmount, balanceNow, officeBlip, hasOfficeBlip, patrolCar, passengerSeat, maxPassengers
 float carSpeed
 
@@ -186,7 +187,7 @@ while true
                 end
             end
 
-            // --- runner: gives up when you hit him, or when you stay close long enough ---
+            // --- runner: gives up when you hit him, or when he is worn out by the chase ---
             if
                 suspectState == STATE_FLEEING
             then
@@ -197,25 +198,35 @@ while true
                     healthLost >= TACKLE_DAMAGE
                 then
                     runnerCaught = 1
+                    print_string_now {text} "~g~Okay, okay! Don't hit me! I give up!" {time} 2500
+                end
+
+                // chase time only counts while you keep up with him; falling behind pauses it
+                gameTimeNow = get_game_timer
+                frameTime = gameTimeNow - lastGameTime
+                lastGameTime = gameTimeNow
+                if
+                    locate_char_any_means_char_2d {self} $scplayer {target} suspectHandle {radius} CHASE_RANGE CHASE_RANGE {drawSphere} false
+                then
+                    chaseTime += frameTime
                 end
                 if
-                    locate_char_any_means_char_2d {self} $scplayer {target} suspectHandle {radius} CATCH_RANGE CATCH_RANGE {drawSphere} false
+                    chaseTime > EXHAUSTION_TIME
                 then
                     if
-                        TimerB > CATCH_TIME
+                        runnerCaught == 0
                     then
                         runnerCaught = 1
+                        print_string_now {text} "~g~Alright, alright... I can't run anymore!" {time} 2500
                     end
-                else
-                    TimerB = 0
                 end
+
                 if
                     runnerCaught == 1
                 then
                     clear_char_tasks_immediately {self} suspectHandle
                     task_hands_up {handle} suspectHandle {time} HANDS_UP_TIME
                     change_blip_colour {self} suspectBlip {color} BLIP_GREEN
-                    print_string_now {text} "~g~Okay, okay! Don't hit me! I give up!" {time} 2500
                     suspectState = STATE_HANDS_UP
                     TimerA = 0
                 end
@@ -375,6 +386,7 @@ while true
                             balanceNow += bonusAmount
                             set_cleo_shared_var {index} SV_BALANCE {value} balanceNow
                             suspectState = STATE_NONE
+                            set_cleo_shared_var {index} SV_ACTIVE_SUSPECT {value} 0
                             wait {time} 400
                             do_fade {time} 500 {direction} 1
                             add_one_off_sound {pos} 0.0 0.0 0.0 {soundId} SOUND_CUFFED
@@ -432,6 +444,7 @@ while true
                 print_string_now {text} "~y~SUSPECT WALKED AWAY" {time} 2000
             end
             suspectState = STATE_NONE
+            set_cleo_shared_var {index} SV_ACTIVE_SUSPECT {value} 0
         end
         continue
     end
@@ -463,6 +476,7 @@ while true
                             nearbyCreatedBy <> PED_CREATED_BY_MISSION
                         then
                             suspectHandle = nearbyChar
+                            set_cleo_shared_var {index} SV_ACTIVE_SUSPECT {value} suspectHandle
                             // Take him over from the ambient AI: flag him as a mission ped (CPed::SetCharCreatedBy,
                             // so he no longer despawns or follows street logic like "leave a stranger's car and run")
                             // and give him the empty decision maker so he only reacts to our tasks.
@@ -515,7 +529,8 @@ while true
                                 change_blip_colour {self} suspectBlip {color} BLIP_RED
                                 print_string_now {text} "~r~SUSPECT IS RUNNING!" {time} 2500
                                 fleeStartHealth = get_char_health {self} suspectHandle
-                                TimerB = 0
+                                chaseTime = 0
+                                lastGameTime = get_game_timer
                             end
                             if
                                 suspectState == STATE_HOSTILE

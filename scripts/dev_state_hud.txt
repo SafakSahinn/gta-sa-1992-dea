@@ -6,6 +6,7 @@
 // F12 +5 corruption
 // F4  reset to the starting state (Wednesday, $450, corruption 0)
 // 7 / 8 / 9  force the next frisk outcome: surrender / flee / fight
+// F3  inspect your front passenger (in a car) or the closest ped: ambient/mission, our suspect or not
 {$CLEO .cs}
 {$INCLUDE include\state.txt}
 
@@ -14,6 +15,7 @@ script_name {name} 'devstat'
 int balanceNow, corruptionNow, storyDay, clockHours, clockMinutes, clockNow
 int minutesLeft, hoursLeft, restMinutes
 string dayLabel, tierLabel
+int inspectPed, inspectCar, inspectPointer, inspectAddress, inspectCreatedBy, activeSuspect, isOurSuspect
 
 wait {time} 2000
 
@@ -109,6 +111,45 @@ while true
         set_cleo_shared_var {index} SV_DEV_FORCE_OUTCOME {value} 3
         print_string_now {text} "~y~NEXT FRISK:~s~ FIGHT" {time} 2000
         while is_key_pressed {keyCode} 0x39
+            wait {time} 0
+        end
+    end
+
+    // F3: inspect a ped - your front passenger in a car, otherwise the closest ped on foot
+    if
+        is_key_pressed {keyCode} 0x72 // F3
+    then
+        inspectPed = -1
+        if
+            is_char_sitting_in_any_car {self} $scplayer
+        then
+            inspectCar = store_car_char_is_in_no_save {self} $scplayer
+            if
+                not is_car_passenger_seat_free {self} inspectCar {seat} 0
+            then
+                inspectPed = get_char_in_car_passenger_seat {self} inspectCar {seat} 0
+            end
+        else
+            inspectCar, inspectPed = store_closest_entities {self} $scplayer
+        end
+        if
+            inspectPed > 0
+        then
+            inspectPointer = get_ped_pointer {char} inspectPed
+            inspectAddress = inspectPointer + 0x484 // CPed::m_nCreatedBy
+            inspectCreatedBy = read_memory {address} inspectAddress {size} 1 {vp} false
+            activeSuspect = get_cleo_shared_var {index} SV_ACTIVE_SUSPECT
+            isOurSuspect = 0
+            if
+                activeSuspect == inspectPed
+            then
+                isOurSuspect = 1
+            end
+            print_formatted_now {format} "PED %d~n~CREATED BY %d (1 = AMBIENT, 2 = MISSION)~n~OUR SUSPECT %d (0 = NO, 1 = YES)" {time} 6000 inspectPed inspectCreatedBy isOurSuspect
+        else
+            print_string_now {text} "~y~NO PED TO INSPECT" {time} 2000
+        end
+        while is_key_pressed {keyCode} 0x72
             wait {time} 0
         end
     end
